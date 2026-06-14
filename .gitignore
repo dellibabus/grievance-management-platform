@@ -141,3 +141,7 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+interview_prep.html
+Interview_Preparation_Grievance_Platform.pdf
+.docs

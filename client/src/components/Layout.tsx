@@ -11,7 +11,8 @@ import {
   LogOut,
   Menu,
   X,
-  FileText
+  FileText,
+  ShieldAlert
 } from "lucide-react";
 
 export const Layout: React.FC = () => {
@@ -49,6 +50,12 @@ export const Layout: React.FC = () => {
       path: "/users",
       icon: Users,
       show: hasPermission("manage_users")
+    },
+    {
+      name: "Audit Logs",
+      path: "/audit-logs",
+      icon: ShieldAlert,
+      show: user?.role === "super_admin" || user?.role === "state_admin"
     },
     {
       name: "Alerts Inbox",

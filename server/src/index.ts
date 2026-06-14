@@ -19,6 +19,7 @@ import userRoutes from "./routes/userRoutes";
 import dashboardRoutes from "./routes/dashboardRoutes";
 import notificationRoutes from "./routes/notificationRoutes";
 import locationRoutes from "./routes/locationRoutes";
+import auditLogRoutes from "./routes/auditLogRoutes";
 
 const app = express();
 const server = http.createServer(app);
@@ -85,6 +86,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/locations", locationRoutes);
+app.use("/api/audit-logs", auditLogRoutes);
 
 // Catch-all 404 handler
 app.use((_req: Request, res: Response, _next: NextFunction) => {
