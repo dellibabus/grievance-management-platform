@@ -23,6 +23,7 @@ const isDev = process.env.NODE_ENV === "development";
 export const AppDataSource = new DataSource({
   type: "postgres",
   url: process.env.DATABASE_URL || "postgresql://postgres:password@localhost:5432/grievance_db",
+  ssl: process.env.DATABASE_URL?.includes("render.com") ? { rejectUnauthorized: false } : false,
   synchronize: true, // Automatically synchronize schema in development
   logging: isDev ? ["query", "error"] : ["error"],
   entities: [
