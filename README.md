@@ -59,16 +59,6 @@ Backend API runs at **http://localhost:5000**
 
 ---
 
-## Default Login Credentials
-
-| Role | Email | Password |
-|---|---|---|
-| Super Admin | admin@grievance.com | Admin@123 |
-| State Admin | state@grievance.com | Admin@123 |
-| District Admin (Vizag) | vizag_admin@grievance.com | Admin@123 |
-| Volunteer (Vizag) | volunteer_vizag@grievance.com | Admin@123 |
-
----
 
 ## API Endpoints
 
@@ -142,26 +132,3 @@ GET /api/locations/roles
 
 ---
 
-## Project Structure
-
-```
-/
-├── client/                   # React 18 + Vite frontend
-│   └── src/
-│       ├── api/              # Axios client with token refresh interceptors
-│       ├── components/       # Layout, ProtectedRoute
-│       ├── context/          # AuthContext, SocketContext, ToastContext
-│       └── pages/            # LandingPage, TrackingPage, LoginPage,
-│                             #   DashboardPage, ComplaintsListPage,
-│                             #   ComplaintDetailPage, CreateComplaintPage,
-│                             #   UserManagementPage, NotificationsPage, ProfilePage
-└── server/                   # Express + TypeScript backend
-    └── src/
-        ├── config/           # data-source.ts, seeder.ts
-        ├── entities/         # 14 TypeORM entities
-        ├── controllers/      # Auth, Complaints, Users, Dashboard, Notifications, Location
-        ├── routes/           # Express routers
-        ├── middlewares/      # authenticate, authorize, upload
-        ├── services/         # auditLogService, notificationService, socketService
-        └── utils/            # jwt.ts
-```
