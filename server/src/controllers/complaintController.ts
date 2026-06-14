@@ -14,6 +14,7 @@ import { AuthenticatedRequest } from "../types/express";
 import { logAction } from "../services/auditLogService";
 import { createNotification } from "../services/notificationService";
 import { sendNewComplaintToDistrict } from "../services/socketService";
+import { sanitizeComplaint } from "../utils/sanitize";
 
 // Zod Validation Schema for creating complaint
 const complaintSchema = z.object({
@@ -265,7 +266,7 @@ export const listComplaints = async (req: AuthenticatedRequest, res: Response) =
     return res.status(200).json({
       success: true,
       count: complaints.length,
-      complaints
+      complaints: complaints.map(sanitizeComplaint)
     });
   } catch (error: any) {
     return res.status(500).json({ success: false, message: error.message });
@@ -318,7 +319,7 @@ export const getComplaintById = async (req: AuthenticatedRequest, res: Response)
 
     return res.status(200).json({
       success: true,
-      complaint,
+      complaint: sanitizeComplaint(complaint),
       attachments,
       updates
     });
@@ -415,7 +416,7 @@ export const updateComplaint = async (req: AuthenticatedRequest, res: Response) 
 
     return res.status(200).json({
       success: true,
-      complaint: savedComplaint,
+      complaint: sanitizeComplaint(savedComplaint),
       message: "Complaint updated successfully"
     });
   } catch (error: any) {
@@ -556,7 +557,7 @@ export const assignComplaint = async (req: AuthenticatedRequest, res: Response) 
     return res.status(200).json({
       success: true,
       message: "Complaint assigned successfully",
-      complaint: savedComplaint
+      complaint: sanitizeComplaint(savedComplaint)
     });
   } catch (error: any) {
     return res.status(500).json({ success: false, message: error.message });

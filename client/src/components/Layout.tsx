@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate, useLocation, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useSocket } from "../context/SocketContext";
-import { useToast } from "../context/ToastContext";
 import {
   LayoutDashboard,
   Inbox,
@@ -18,40 +16,9 @@ import {
 
 export const Layout: React.FC = () => {
   const { user, logout, hasPermission } = useAuth();
-  const { socket } = useSocket();
-  const { showToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  // Subscribe to real-time events via websocket
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleNotification = (data: { title: string; message: string; type: string }) => {
-      let toastType: "success" | "warning" | "error" | "info" = "info";
-      if (data.type === "complaint_assigned") toastType = "success";
-      if (data.type === "error") toastType = "error";
-      if (data.type === "warning") toastType = "warning";
-      showToast(data.title, data.message, toastType);
-    };
-
-    const handleNewComplaint = (data: { title: string; ticket_number: string }) => {
-      showToast(
-        "New Grievance Submitted",
-        `Ticket ${data.ticket_number}: ${data.title} was submitted in your district.`,
-        "info"
-      );
-    };
-
-    socket.on("notification", handleNotification);
-    socket.on("complaint:new", handleNewComplaint);
-
-    return () => {
-      socket.off("notification", handleNotification);
-      socket.off("complaint:new", handleNewComplaint);
-    };
-  }, [socket, showToast]);
 
   const handleLogout = async () => {
     await logout();
@@ -78,7 +45,7 @@ export const Layout: React.FC = () => {
       show: true
     },
     {
-      name: "User Directory",
+      name: "User Management",
       path: "/users",
       icon: Users,
       show: hasPermission("manage_users")
@@ -100,13 +67,13 @@ export const Layout: React.FC = () => {
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col md:flex-row">
+    <div className="h-screen bg-slate-950 text-slate-100 flex flex-col md:flex-row overflow-hidden">
       {/* Mobile Header Bar */}
       <header className="md:hidden bg-slate-900 border-b border-slate-800 p-4 flex justify-between items-center z-30">
         <Link to="/dashboard" className="flex items-center gap-2">
           <FileText className="h-6 w-6 text-blue-500" />
           <span className="font-bold text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
-            Grievance AI
+            Grievance
           </span>
         </Link>
         <button onClick={toggleSidebar} className="p-2 text-slate-400 hover:text-slate-100">
@@ -116,34 +83,17 @@ export const Layout: React.FC = () => {
 
       {/* Sidebar navigation */}
       <aside
-        className={`fixed inset-y-0 left-0 bg-slate-900 border-r border-slate-800/80 w-64 p-5 z-40 transform transition-transform duration-300 ease-in-out md:translate-x-0 md:relative ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed inset-y-0 left-0 bg-slate-900 border-r border-slate-800/80 w-64 p-5 z-40 transform transition-transform duration-300 ease-in-out md:translate-x-0 md:relative md:h-screen md:shrink-0 overflow-y-auto ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="hidden md:flex items-center gap-3 mb-8 px-2">
+          <div className="hidden md:flex items-center gap-3 mb-8 px-2 shrink-0">
             <FileText className="h-7 w-7 text-blue-500 animate-pulse" />
             <span className="font-extrabold text-xl tracking-wider bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
-              Grievance AI
+              Grievance
             </span>
           </div>
-
-          {/* User badge */}
-          {user && (
-            <div className="bg-slate-950/60 border border-slate-800/50 p-4 rounded-xl mb-6 flex flex-col gap-1.5 overflow-hidden">
-              <span className="text-xs font-semibold text-blue-400 uppercase tracking-widest">
-                {user.role.replace("_", " ")}
-              </span>
-              <span className="font-semibold text-sm truncate">{user.name}</span>
-              <span className="text-xs text-slate-400 truncate">{user.email}</span>
-              {user.district && (
-                <span className="text-[10px] bg-slate-800/80 text-slate-300 py-0.5 px-2 rounded-md self-start mt-1">
-                  📍 {user.district.name}
-                </span>
-              )}
-            </div>
-          )}
 
           {/* Navigation Links */}
           <nav className="flex-1 flex flex-col gap-1">
@@ -156,11 +106,10 @@ export const Layout: React.FC = () => {
                     key={item.name}
                     to={item.path}
                     onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-250 ${
-                      isActive
-                        ? "bg-blue-600 text-white shadow-md shadow-blue-600/10"
-                        : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/55"
-                    }`}
+                    className={`flex items-center gap-3 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-250 ${isActive
+                      ? "bg-blue-600 text-white shadow-md shadow-blue-600/10"
+                      : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/55"
+                      }`}
                   >
                     <item.icon className="h-4 w-4" />
                     <span>{item.name}</span>
@@ -194,11 +143,33 @@ export const Layout: React.FC = () => {
               <Bell className="h-5 w-5" />
               <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-blue-500"></span>
             </Link>
-            <Link to="/profile" className="flex items-center gap-2 border-l border-slate-800 pl-4">
-              <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-xs">
-                {user?.name.charAt(0)}
+            <div className="relative group border-l border-slate-800 pl-4">
+              <Link to="/profile" className="flex items-center">
+                <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-xs shrink-0">
+                  {user?.name.charAt(0)}
+                </div>
+              </Link>
+
+              {/* Hover dropdown card */}
+              <div className="absolute right-0 top-full mt-2 w-64 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-4 opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200 z-30">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-sm shrink-0">
+                    {user?.name.charAt(0)}
+                  </div>
+                  <div className="flex flex-col leading-tight min-w-0">
+                    <span className="text-sm font-semibold text-slate-100 truncate">{user?.name}</span>
+                    <span className="text-[11px] text-slate-400 truncate">{user?.email}</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between border-t border-slate-800 pt-2.5">
+                  <span className="text-[11px] text-slate-500 uppercase tracking-wider font-semibold">District</span>
+                  <span className="text-xs text-blue-400 font-semibold">{user?.district?.name || "State Level"}</span>
+                </div>
+                <Link to="/profile" className="block text-center text-[11px] font-semibold text-blue-400 hover:text-blue-300 mt-3 pt-2.5 border-t border-slate-800">
+                  View Profile
+                </Link>
               </div>
-            </Link>
+            </div>
           </div>
         </header>
 

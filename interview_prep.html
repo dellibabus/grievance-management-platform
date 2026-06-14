@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Grievance Management Platform — Interview Preparation</title>
+<style>
+  @page { size: A4; margin: 22mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #1f2933;
+    font-size: 11.5px;
+    line-height: 1.55;
+  }
+  .cover {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    page-break-after: always;
+  }
+  .cover h1 {
+    font-size: 32px;
+    color: #1d4ed8;
+    margin-bottom: 6px;
+  }
+  .cover h2 {
+    font-size: 18px;
+    color: #475569;
+    font-weight: 400;
+    margin-top: 0;
+  }
+  .cover .meta {
+    margin-top: 40px;
+    font-size: 13px;
+    color: #64748b;
+  }
+  .cover .badge {
+    margin-top: 30px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1d4ed8;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 12px;
+  }
+  h1 { font-size: 22px; color: #1d4ed8; border-bottom: 2px solid #1d4ed8; padding-bottom: 4px; margin-top: 0;}
+  h2 { font-size: 16px; color: #1e3a8a; margin-top: 22px; border-left: 4px solid #1d4ed8; padding-left: 8px;}
+  h3 { font-size: 13px; color: #334155; margin-top: 14px; }
+  section { page-break-before: always; }
+  section:first-of-type { page-break-before: avoid; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 14px; font-size: 10.5px; }
+  th, td { border: 1px solid #cbd5e1; padding: 5px 7px; text-align: left; vertical-align: top; }
+  th { background: #eff6ff; color: #1e3a8a; }
+  code, pre {
+    font-family: 'Consolas', 'Courier New', monospace;
+    background: #f1f5f9;
+    border-radius: 4px;
+  }
+  code { padding: 1px 4px; font-size: 10.5px; color: #b91c1c; }
+  pre {
+    padding: 8px 10px;
+    overflow-x: auto;
+    font-size: 10px;
+    line-height: 1.4;
+    border: 1px solid #e2e8f0;
+    margin: 6px 0 12px;
+  }
+  pre code { color: #1e293b; background: none; padding: 0; }
+  .qa { margin-bottom: 10px; page-break-inside: avoid; }
+  .q { font-weight: 600; color: #0f172a; }
+  .q::before { content: "Q: "; color: #1d4ed8; font-weight: 700; }
+  .a { margin: 3px 0 0 14px; color: #334155; }
+  .a::before { content: "A: "; color: #16a34a; font-weight: 700; }
+  ul, ol { margin: 4px 0 10px 18px; }
+  li { margin-bottom: 3px; }
+  .tag { display: inline-block; background:#dbeafe; color:#1e3a8a; border-radius: 3px; padding: 1px 6px; font-size: 9.5px; margin-right:4px;}
+  .note { background: #fef9c3; border-left: 4px solid #eab308; padding: 6px 10px; font-size: 10.5px; margin: 8px 0; }
+  .good { background: #f0fdf4; border-left: 4px solid #22c55e; padding: 6px 10px; font-size: 10.5px; margin: 6px 0; }
+  .bad { background: #fef2f2; border-left: 4px solid #ef4444; padding: 6px 10px; font-size: 10.5px; margin: 6px 0; }
+  .small { font-size: 10px; color: #64748b; }
+  .toc li { margin-bottom: 6px; }
+  .toc a { color: #1d4ed8; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>Political Intelligence &amp;<br>Grievance Management Platform</h1>
+  <h2>Interview Preparation Guide</h2>
+  <div class="badge">Full Stack Developer Assessment — Starkin Solutions</div>
+  <div class="meta">
+    Candidate: Delli Babu &nbsp;|&nbsp; Stack: React + Vite + TypeScript, Node.js + Express + TypeORM + PostgreSQL<br>
+    Contents: Project Walkthrough · Architecture · Database Design · Code Review · 70+ Interview Q&amp;A
+  </div>
+</div>
+
+<!-- TOC -->
+<section>
+<h1>Table of Contents</h1>
+<ol class="toc">
+  <li><a>1. One-Minute Project Pitch</a></li>
+  <li><a>2. Architecture &amp; Tech Stack</a></li>
+  <li><a>3. Database Design (14 Entities + ERD)</a></li>
+  <li><a>4. Backend Walkthrough (Auth, RBAC, Complaint Lifecycle, Sockets, Files, Dashboard)</a></li>
+  <li><a>5. Frontend Walkthrough (Routing, Auth Context, Socket Context, Data Fetching)</a></li>
+  <li><a>6. Code Review — Strengths &amp; Improvement Areas</a></li>
+  <li><a>7. Interview Q&amp;A — Project Walkthrough &amp; Behavioral</a></li>
+  <li><a>8. Interview Q&amp;A — Authentication, JWT &amp; RBAC</a></li>
+  <li><a>9. Interview Q&amp;A — Database &amp; TypeORM</a></li>
+  <li><a>10. Interview Q&amp;A — API Design, Validation &amp; Error Handling</a></li>
+  <li><a>11. Interview Q&amp;A — React &amp; Frontend</a></li>
+  <li><a>12. Interview Q&amp;A — Real-Time (Socket.io)</a></li>
+  <li><a>13. Interview Q&amp;A — System Design, Scaling &amp; Bonus Features</a></li>
+  <li><a>14. Tricky / Code-Specific Questions (Things They Might Probe)</a></li>
+</ol>
+</section>
+
+<!-- 1. PITCH -->
+<section>
+<h1>1. One-Minute Project Pitch</h1>
+<p>
+"I built a production-style <b>Grievance Management Platform</b> for Andhra Pradesh citizens to file, track, and
+resolve civic complaints (potholes, healthcare access, water supply, electricity, education issues).
+It's a full MERN-style stack but with <b>PostgreSQL + TypeORM</b> instead of Mongo, and <b>TypeScript</b>
+across both frontend and backend.</p>
+<p>
+The platform supports <b>four roles</b> — Super Admin, State Admin, District Admin, and Volunteer — each with
+different visibility and permissions enforced both at the API layer (RBAC middleware) and the UI layer (route guards).
+Citizens can submit complaints anonymously from a public landing page with file attachments (images/PDF/video),
+and track status later using a generated ticket number like <code>GRV-2026-10001</code>, with no login required.</p>
+<p>
+Internally, admins assign complaints to volunteers or district admins, the assignee gets a <b>real-time
+Socket.io notification</b>, and every status change is recorded in an immutable complaint timeline
+(<code>complaint_updates</code>) and a security <b>audit log</b> (who did what, when, from which IP).
+The dashboard uses <b>Recharts</b> to visualize status breakdowns, category distribution, district-wise load,
+and a 6-month trend — all scoped by the logged-in user's role."
+</p>
+
+<h2>Key Differentiators to Mention</h2>
+<ul>
+  <li><b>Security</b>: short-lived (15 min) JWT access tokens + HTTPOnly, SameSite=strict refresh token cookies (7 days), bcrypt password hashing, axios interceptor auto-refresh-on-401 with request queuing.</li>
+  <li><b>RBAC done at two layers</b>: Express middleware (<code>authorize()</code>) checks permission arrays from the DB-backed <code>roles.permissions</code> jsonb column; React route guards (<code>ProtectedRoute</code>) hide/redirect pages.</li>
+  <li><b>Data integrity</b>: 14 normalized relational tables, UUID PKs, foreign keys with cascade rules, unique ticket numbers via <code>@BeforeInsert</code> hook.</li>
+  <li><b>Auditability</b>: every write (login, create/assign/update/delete complaint, register user) is logged to <code>audit_logs</code> with actor, action, entity, meta JSON, and IP.</li>
+  <li><b>Real-time UX</b>: Socket.io rooms per-user (<code>user:&lt;id&gt;</code>) and per-district (<code>district:&lt;id&gt;</code>) so notifications and new-complaint alerts are pushed instantly.</li>
+</ul>
+</section>
+
+<!-- 2. ARCHITECTURE -->
+<section>
+<h1>2. Architecture &amp; Tech Stack</h1>
+
+<h2>2.1 Stack Summary</h2>
+<table>
+<tr><th>Layer</th><th>Technology</th><th>Why</th></tr>
+<tr><td>Frontend</td><td>React 18 + Vite + TypeScript</td><td>Fast HMR, modern build, strong typing across UI</td></tr>
+<tr><td>Styling</td><td>Tailwind CSS</td><td>Utility-first, fast iteration, consistent design tokens</td></tr>
+<tr><td>Data fetching</td><td>TanStack Query v5 + Axios</td><td>Caching, retries, background refetch, request/response interceptors for token refresh</td></tr>
+<tr><td>Forms &amp; validation</td><td>React Hook Form + Zod</td><td>Uncontrolled performant forms + schema validation shared mental model with backend Zod schemas</td></tr>
+<tr><td>Routing</td><td>React Router v6</td><td>Nested routes + layout routes for role-guarded sections</td></tr>
+<tr><td>Charts</td><td>Recharts</td><td>Declarative React charts for dashboard analytics</td></tr>
+<tr><td>Real-time</td><td>Socket.io-client / Socket.io server</td><td>Room-based push notifications, fallback to polling transport</td></tr>
+<tr><td>Backend</td><td>Node.js + Express + TypeScript</td><td>Lightweight, explicit middleware pipeline, easy to reason about</td></tr>
+<tr><td>ORM</td><td>TypeORM 0.3 (DataSource API)</td><td>Decorator-based entities, query builder for analytics, <code>synchronize: true</code> for fast dev iteration</td></tr>
+<tr><td>Database</td><td>PostgreSQL</td><td>Relational integrity, jsonb for flexible permission arrays, UUID + ILIKE search</td></tr>
+<tr><td>Auth</td><td>JWT (jsonwebtoken) + bcrypt</td><td>Stateless access tokens, salted password hashes</td></tr>
+<tr><td>File uploads</td><td>Multer (disk storage)</td><td>Multipart parsing, mimetype whitelist, 50MB limit</td></tr>
+</table>
+
+<h2>2.2 High-Level Request Flow</h2>
+<pre><code>Browser (React SPA, :5173)
+  │  axios (withCredentials: true, Authorization: Bearer &lt;accessToken&gt;)
+  ▼
+Express App (:5000)
+  │  cors() → express.json() → cookieParser() → static /uploads
+  │
+  ├─ /api/auth/*           (login, register, refresh, logout, me)
+  ├─ /api/complaints/*     (CRUD, assign, update, track — RBAC + multer)
+  ├─ /api/users/*          (super_admin / manage_users)
+  ├─ /api/dashboard/*      (role-scoped aggregates via QueryBuilder)
+  ├─ /api/notifications/*  (per-user inbox)
+  └─ /api/locations/*      (districts → mandals → villages, categories, roles)
+  │
+  ▼
+TypeORM DataSource ── PostgreSQL (grievance_db)
+  │
+  └─ Socket.io server: rooms "user:&lt;id&gt;" and "district:&lt;id&gt;"
+       → emits "notification" and "complaint:new" events
+</code></pre>
+
+<h2>2.3 Folder Structure</h2>
+<pre><code>server/src
+ ├─ config/        data-source.ts (TypeORM config), seeder.ts (demo data)
+ ├─ entities/      14 TypeORM entity classes (User, Role, Complaint, ...)
+ ├─ middlewares/   authenticate.ts, authorize.ts, upload.ts
+ ├─ controllers/   auth, complaint, dashboard, location, notification, user
+ ├─ routes/        thin Express routers wiring middleware → controller
+ ├─ services/      auditLogService, notificationService, socketService
+ ├─ types/express.ts  AuthenticatedRequest + JWT payload shape
+ └─ index.ts       app bootstrap, Socket.io, DB init + auto-seed
+
+client/src
+ ├─ api/client.ts        axios instance + refresh-token interceptor
+ ├─ context/             AuthContext, SocketContext, ToastContext
+ ├─ components/          Layout (nav/sidebar), ProtectedRoute (RBAC guard)
+ └─ pages/                Landing, Tracking, Login, Dashboard, Complaints
+                          (List/Detail/Create), Users, Notifications, Profile
+</code></pre>
+</section>
+
+<!-- 3. DATABASE -->
+<section>
+<h1>3. Database Design (14 Entities)</h1>
+
+<h2>3.1 Entity Relationship Summary</h2>
+<pre><code>users ──belongs_to──► roles
+users ──belongs_to──► districts (nullable: super/state admins have none)
+users ──has_many────► refresh_tokens, audit_logs, notifications
+
+complaints ──belongs_to──► categories, districts, mandals, villages(nullable)
+complaints ──belongs_to──► users (assigned_to, created_by — both nullable)
+complaints ──has_many────► assignments, complaint_updates, attachments
+
+districts ──has_many──► mandals ──has_many──► villages   (cascading geo hierarchy)
+</code></pre>
+
+<h2>3.2 Entity-by-Entity Notes</h2>
+<table>
+<tr><th>Entity</th><th>Purpose</th><th>Notable design points</th></tr>
+<tr><td>Role</td><td>4 roles, stores <code>permissions: jsonb</code> array</td><td>Permission checks are just array membership — no separate join table needed for role↔permission</td></tr>
+<tr><td>Permission</td><td>Catalog of permission names</td><td>Mostly descriptive/reference; actual enforcement reads <code>role.permissions</code></td></tr>
+<tr><td>User</td><td>Auth + profile</td><td>UUID PK, unique email, bcrypt hash, nullable district (HQ-level roles), <code>is_active</code> soft-disable</td></tr>
+<tr><td>District / Mandal / Village</td><td>3-level AP geo hierarchy</td><td>Mandal FK→District (CASCADE delete), Village FK→Mandal (CASCADE) — deleting a district cleans the tree</td></tr>
+<tr><td>Category</td><td>Complaint type (Infrastructure, Healthcare...)</td><td><code>is_active</code> flag lets admins retire categories without breaking history</td></tr>
+<tr><td>Complaint</td><td>Core entity</td><td><code>ticket_number</code> auto-generated via <code>@BeforeInsert</code> (<code>GRV-YYYY-XXXXX</code>), <code>status</code>/<code>priority</code> string enums, several <b>eager</b> relations (category, district, mandal, village, assigned_to, created_by)</td></tr>
+<tr><td>Assignment</td><td>Append-only assignment history</td><td>assigned_by / assigned_to / notes / timestamp — kept even if complaint reassigned later</td></tr>
+<tr><td>ComplaintUpdate</td><td>Timeline / audit trail visible to citizens</td><td>status snapshot + comment + actor, ordered ASC for timeline UI</td></tr>
+<tr><td>Attachment</td><td>Uploaded files</td><td>file_type enum (image/pdf/video) derived from mimetype, stores relative <code>/uploads/...</code> URL</td></tr>
+<tr><td>Notification</td><td>Per-user inbox</td><td><code>is_read</code> boolean, <code>reference_id</code> links back to complaint, paired with Socket.io push</td></tr>
+<tr><td>AuditLog</td><td>Security/compliance trail</td><td>actor (nullable for anonymous), action, entity, entity_id, <code>meta: jsonb</code>, ip_address</td></tr>
+<tr><td>RefreshToken</td><td>Server-side session control</td><td>Stored so logout/refresh can revoke (<code>is_revoked</code>) — JWT alone can't be revoked, this DB row makes it possible</td></tr>
+</table>
+
+<h2>3.3 Why PostgreSQL + TypeORM here?</h2>
+<ul>
+  <li>The domain is inherently <b>relational</b> — complaints reference categories, geography, users, with strict FK integrity (no orphaned complaints).</li>
+  <li><code>jsonb</code> on <code>roles.permissions</code> and <code>audit_logs.meta</code> gives schema flexibility for evolving permission sets / audit payloads without migrations.</li>
+  <li>TypeORM's <b>QueryBuilder</b> is used for all dashboard aggregates (GROUP BY status/category/district, TO_CHAR for monthly trends) — raw SQL power with parameter binding (SQL-injection safe).</li>
+  <li><code>synchronize: true</code> auto-creates/updates tables from entity decorators — fast for assessment/dev; in production this would be replaced by versioned migrations.</li>
+</ul>
+</section>
+
+<!-- 4. BACKEND -->
+<section>
+<h1>4. Backend Walkthrough</h1>
+
+<h2>4.1 Authentication Flow</h2>
+<ol>
+  <li><b>Login</b> (<code>POST /api/auth/login</code>): looks up user by email with <code>role</code> + <code>district</code> relations, <code>bcrypt.compare()</code> the password, then:
+    <ul>
+      <li>Signs a 15-min <b>access token</b> (<code>signAccessToken</code>) containing <code>{id, email, role, permissions, districtId}</code>.</li>
+      <li>Signs a 7-day <b>refresh token</b> (different secret), persists it in <code>refresh_tokens</code> table, and sets it as an <code>HttpOnly, SameSite=strict</code> cookie.</li>
+      <li>Logs a <code>LOGIN</code> audit entry.</li>
+    </ul>
+  </li>
+  <li><b>Authenticated requests</b>: client sends <code>Authorization: Bearer &lt;accessToken&gt;</code>. <code>authenticate</code> middleware verifies signature/expiry with <code>JWT_SECRET</code> and attaches <code>req.user</code>.</li>
+  <li><b>Refresh</b> (<code>POST /api/auth/refresh</code>): reads the HttpOnly cookie, verifies it against <code>JWT_REFRESH_SECRET</code>, looks the raw token up in <code>refresh_tokens</code> (checks <code>is_revoked</code> and <code>expires_at</code>), and issues a new access token.</li>
+  <li><b>Logout</b>: marks the matching <code>refresh_tokens</code> row <code>is_revoked = true</code> and clears the cookie — this is what makes JWT logout actually effective server-side.</li>
+</ol>
+
+<h2>4.2 RBAC Enforcement</h2>
+<p>Two middlewares compose per route:</p>
+<pre><code>// authenticate.ts — verifies JWT, sets req.user
+// authorize(["assign_complaint"]) — checks permission array
+
+router.post("/:id/assign", authenticate, authorize(["assign_complaint"]), assignComplaint);
+router.delete("/:id", authenticate, authorize(["delete_complaint"]), deleteComplaint);
+</code></pre>
+<p><code>authorize()</code> gives <code>super_admin</code> an automatic bypass, otherwise checks
+<code>requiredPermissions.every(p =&gt; req.user.permissions.includes(p))</code> — permissions come straight
+from the JWT payload (sourced from <code>role.permissions</code> jsonb at login time).</p>
+
+<p><b>Row-level scoping</b> (beyond yes/no permission checks) is done manually inside controllers, e.g.
+<code>listComplaints</code>:</p>
+<pre><code>if (role === "district_admin") {
+  qb.andWhere("complaint.district_id = :uDistrictId", { uDistrictId: districtId });
+} else if (role === "volunteer") {
+  qb.andWhere("complaint.assigned_to = :uUserId", { uUserId: userId });
+}</code></pre>
+
+<h2>4.3 Complaint Lifecycle</h2>
+<table>
+<tr><th>Step</th><th>Endpoint</th><th>What happens</th></tr>
+<tr><td>1. Citizen files complaint</td><td><code>POST /api/complaints</code> (public, <code>upload.array("attachments", 5)</code> + <code>optionalAuthenticate</code>)</td><td>Zod-validates payload, resolves category/district/mandal/village FKs, auto-generates ticket number, saves attachments, writes first <code>complaint_updates</code> row ("registered"), emits <code>complaint:new</code> to <code>district:&lt;id&gt;</code> room, notifies district admins, writes audit log</td></tr>
+<tr><td>2. Admin assigns</td><td><code>POST /api/complaints/:id/assign</code> (needs <code>assign_complaint</code>)</td><td>Validates assignee is a volunteer/district_admin in the <i>same district</i>, creates an <code>Assignment</code> row, sets <code>status = "assigned"</code> if it was pending, writes timeline update, creates a <b>real-time notification</b> for the assignee</td></tr>
+<tr><td>3. Volunteer/admin updates</td><td><code>POST /api/complaints/:id/update</code></td><td>Adds a comment; volunteers restricted to setting status only to <code>in_progress</code>/<code>resolved</code>; sets <code>resolved_at</code> when resolved</td></tr>
+<tr><td>4. Generic edit</td><td><code>PUT /api/complaints/:id</code></td><td>Admins can change status/priority; volunteers can change status only (not priority); writes a diff-style comment to the timeline</td></tr>
+<tr><td>5. Public tracking</td><td><code>GET /api/complaints/track/:ticket</code> (no auth)</td><td>Returns a <b>sanitized</b> view (no citizen phone/email, no internal user refs) plus the public timeline</td></tr>
+</table>
+
+<h2>4.4 File Uploads (Multer)</h2>
+<ul>
+  <li>Disk storage under <code>UPLOAD_DIR</code> (<code>./uploads</code>), filename = <code>fieldname-timestamp-random.ext</code> to avoid collisions.</li>
+  <li><code>fileFilter</code> whitelists mimetypes: jpeg/png/gif/webp, pdf, mp4/mov/mkv/mpeg — rejects everything else with an <code>Error</code> (caught by Express error handler).</li>
+  <li>50MB per-file limit; up to 5 files per complaint (<code>upload.array("attachments", 5)</code>).</li>
+  <li><code>Attachment.file_type</code> derived server-side from <code>file.mimetype</code> prefix — never trusts client-provided type.</li>
+  <li>Served statically: <code>app.use("/uploads", express.static(path.resolve(uploadDir)))</code>.</li>
+</ul>
+
+<h2>4.5 Real-Time Notifications (Socket.io)</h2>
+<pre><code>// On connect, client passes userId & districtId as query params
+socket.join(`user:${userId}`);
+socket.join(`district:${districtId}`);
+
+// Server pushes:
+sendNotificationToUser(userId, {...})       → io.to(`user:${userId}`).emit("notification", ...)
+sendNewComplaintToDistrict(districtId, {...}) → io.to(`district:${districtId}`).emit("complaint:new", ...)
+</code></pre>
+<p>Every <code>createNotification()</code> call both persists a <code>Notification</code> row (so it survives reload /
+shows in the inbox) <i>and</i> emits a live socket event (so it shows as a toast immediately).</p>
+
+<h2>4.6 Dashboard Analytics</h2>
+<p>All four chart endpoints (<code>/stats</code>, <code>/by-district</code>, <code>/by-category</code>, <code>/by-status</code>, <code>/trend</code>)
+use TypeORM <b>QueryBuilder</b> with <code>GROUP BY</code> + <code>COUNT()</code>, scoped for <code>district_admin</code>
+via a shared <code>applyDashboardScope()</code> helper. The trend endpoint uses
+<code>TO_CHAR(complaint.created_at, 'YYYY-MM')</code> and then back-fills the last 6 months client-side so months
+with zero complaints still appear on the chart (no gaps in the line graph).</p>
+
+<h2>4.7 Auto-Seeding</h2>
+<p>On boot, <code>index.ts</code> checks <code>roles</code> table count; if 0, runs <code>runSeeder()</code> which
+truncates everything (dependency-ordered) and inserts: 9 permissions, 4 roles, 5 categories, 5 districts ×
+3 mandals × 3 villages, 4 demo users (super_admin / state_admin / district_admin / volunteer, all
+<code>Admin@123</code>), and 10 realistic sample complaints with timeline history.</p>
+</section>
+
+<!-- 5. FRONTEND -->
+<section>
+<h1>5. Frontend Walkthrough</h1>
+
+<h2>5.1 App Composition &amp; Routing</h2>
+<p><code>App.tsx</code> nests providers: <code>QueryClientProvider → BrowserRouter → AuthProvider → SocketProvider → ToastProvider</code>,
+then <code>Routes</code>:</p>
+<ul>
+  <li><b>Public</b>: <code>/</code> (landing + complaint form), <code>/track</code>, <code>/login</code>.</li>
+  <li><b>Protected shell</b>: everything else wrapped in <code>&lt;ProtectedRoute&gt;</code> + <code>&lt;Layout&gt;</code> (nav/sidebar).</li>
+  <li><b>Permission-gated nested route</b>: <code>/dashboard</code> requires <code>view_dashboard</code>, <code>/users</code> requires <code>manage_users</code> — both via a second <code>&lt;ProtectedRoute requiredPermissions={[...]}&gt;</code> wrapping just that route.</li>
+  <li><b>Fallback</b>: unknown authenticated paths redirect to <code>/complaints</code>.</li>
+</ul>
+
+<h2>5.2 AuthContext</h2>
+<ul>
+  <li>On mount, calls <code>POST /auth/refresh</code> (using the HttpOnly cookie) to silently obtain a fresh access token, then <code>GET /auth/me</code> to hydrate the user profile — this is what gives "stay logged in after page refresh" behavior <i>without storing the access token in localStorage</i>.</li>
+  <li><code>login()</code> stores the access token in a module-level variable (<code>setLocalAccessToken</code>) — deliberately <b>not</b> localStorage, reducing XSS token-theft risk.</li>
+  <li><code>hasPermission(perm)</code> — super_admin always true, else checks <code>user.permissions.includes(perm)</code>, used by <code>ProtectedRoute</code> and conditionally rendered UI (e.g., "Delete" button only for users with <code>delete_complaint</code>).</li>
+  <li>Listens for a custom <code>"auth:logout"</code> window event dispatched by the axios interceptor when a silent refresh fails — keeps context state in sync with interceptor-driven logouts.</li>
+</ul>
+
+<h2>5.3 Axios Client &amp; Token Refresh Interceptor</h2>
+<ul>
+  <li>Request interceptor attaches <code>Authorization: Bearer &lt;accessToken&gt;</code> from the in-memory token.</li>
+  <li>Response interceptor: on <code>401</code> (and not already retried, and not the login/refresh endpoints themselves), it:
+    <ol>
+      <li>Sets an <code>isRefreshing</code> flag and calls <code>/auth/refresh</code>.</li>
+      <li>On success, updates the in-memory token and <b>replays all queued requests</b> that piled up while refreshing (via a <code>refreshSubscribers</code> array) — prevents a "thundering herd" of parallel refresh calls.</li>
+      <li>On failure, clears the token and dispatches <code>auth:logout</code>.</li>
+    </ol>
+  </li>
+</ul>
+
+<h2>5.4 SocketContext</h2>
+<p>Opens a socket connection only when <code>user</code> is present, passing <code>userId</code> and <code>districtId</code> as
+handshake query params so the server can join the right rooms. Falls back from <code>websocket</code> to
+<code>polling</code> transport. Cleans up (disconnect) on user logout or unmount.</p>
+
+<h2>5.5 Pages</h2>
+<table>
+<tr><th>Page</th><th>Highlights</th></tr>
+<tr><td>LandingPage</td><td>Public complaint form — React Hook Form + Zod, cascading District→Mandal→Village selects fetched via TanStack Query, file input for attachments (multipart)</td></tr>
+<tr><td>TrackingPage</td><td>Ticket-number lookup, renders sanitized complaint + timeline, no auth</td></tr>
+<tr><td>DashboardPage</td><td>Recharts: pie (status), bar (category), horizontal bar (district), line (6-month trend) — all role-scoped by backend</td></tr>
+<tr><td>ComplaintsListPage</td><td>Filters: status, priority, district (admin-only), category, search (ILIKE on ticket/title/citizen)</td></tr>
+<tr><td>ComplaintDetailPage</td><td>Timeline, attachments, assignment selector (role-gated), status/priority update forms</td></tr>
+<tr><td>UserManagementPage</td><td>super_admin only — CRUD users, assign role + district</td></tr>
+<tr><td>NotificationsPage</td><td>Inbox fed by REST + live Socket.io <code>"notification"</code> events</td></tr>
+</table>
+</section>
+
+<!-- 6. CODE REVIEW -->
+<section>
+<h1>6. Code Review — Strengths &amp; Improvement Areas</h1>
+<p class="small">Be ready to discuss these honestly — interviewers respect candidates who can critique their own code.</p>
+
+<h2>6.1 Strengths</h2>
+<div class="good"><b>Consistent response shape</b> — every endpoint returns <code>{ success, ...payload }</code> or <code>{ success: false, message }</code>, making frontend error handling predictable.</div>
+<div class="good"><b>Defense in depth for auth</b> — short-lived access tokens, revocable refresh tokens stored server-side, HttpOnly cookies, bcrypt with per-user salt, in-memory (not localStorage) access token.</div>
+<div class="good"><b>RBAC at multiple layers</b> — route-level permission middleware + row-level query scoping + frontend route guards + conditional rendering.</div>
+<div class="good"><b>Full audit trail</b> — every mutating action logs actor/action/entity/IP, satisfying the "Audit Logs" requirement properly (not just a stub).</div>
+<div class="good"><b>Type safety end-to-end</b> — shared-shape DTOs (e.g., <code>UserSessionPayload</code>), Zod validation on the create-complaint payload mirrors the entity constraints.</div>
+
+<h2>6.2 Honest Improvement Areas (good to pre-empt)</h2>
+<div class="bad"><b>TypeORM <code>synchronize: true</code></b> in <code>data-source.ts</code> is convenient for dev/demo but unsafe for production — schema drift should be managed via generated migrations (<code>typeorm migration:generate</code>).</div>
+<div class="bad"><b>Eager relations on <code>Complaint</code></b> (category, district, mandal, village, assigned_to, created_by all <code>eager: true</code>) combined with explicit <code>leftJoinAndSelect</code> in <code>listComplaints</code> works but can over-fetch on high-traffic list endpoints — could switch to lazy + selective joins for performance at scale.</div>
+<div class="bad"><b>No pagination on <code>GET /api/complaints</code></b> — <code>getMany()</code> returns the full result set; for a state with thousands of complaints this needs <code>skip/take</code> + total count.</div>
+<div class="bad"><b>Refresh tokens accumulate</b> — no scheduled cleanup job for expired/revoked rows in <code>refresh_tokens</code> (would grow unbounded over time; a cron/background job would prune them).</div>
+<div class="bad"><b>Rate limiting / brute-force protection</b> absent on <code>/api/auth/login</code> — would add <code>express-rate-limit</code> in production.</div>
+<div class="bad"><b>Bonus items not yet implemented</b>: Docker, Swagger/OpenAPI docs, email notifications, CI/CD, PDF/Excel export, background job queue (e.g., BullMQ) — all explicitly called out as optional/bonus in the brief, good to mention as "next steps" roadmap.</div>
+<div class="bad"><b>Refresh-token rotation</b> — current refresh tokens are long-lived (7 days) and not rotated on use; rotating on each refresh (and revoking the old one) would reduce replay-attack windows.</div>
+
+<h2>6.3 If Asked "What Would You Do With More Time?"</h2>
+<ul>
+  <li>Add pagination + server-side sorting to complaint listings.</li>
+  <li>Swap <code>synchronize: true</code> for migrations before any production deploy.</li>
+  <li>Add Swagger/OpenAPI spec (the bonus item) — Express routes are already cleanly separated, easy to annotate.</li>
+  <li>Add a background job (node-cron or BullMQ) for refresh-token cleanup and "complaint SLA breach" email reminders.</li>
+  <li>Add integration tests (Jest + Supertest) for the auth and RBAC flows — highest-risk surface area.</li>
+  <li>Containerize with Docker Compose (postgres + server + client) for one-command setup.</li>
+</ul>
+</section>
+
+<!-- 7. Q&A PROJECT/BEHAVIORAL -->
+<section>
+<h1>7. Interview Q&amp;A — Project Walkthrough &amp; Behavioral</h1>
+
+<div class="qa"><div class="q">Walk me through what happens when a citizen submits a complaint.</div>
+<div class="a">They fill the public landing-page form (title, description, category, district→mandal→village cascading selects, contact info, optional attachments). React Hook Form + Zod validate client-side. On submit, axios sends a <code>multipart/form-data POST</code> to <code>/api/complaints</code> (no auth required). The server re-validates with Zod, resolves all FK relations, auto-generates a <code>GRV-YYYY-XXXXX</code> ticket number via a <code>@BeforeInsert</code> hook, saves the complaint + any attachments, writes the first timeline entry, emits a <code>complaint:new</code> Socket.io event to that district's room, creates persistent notifications for district admins, writes an audit log, and returns the ticket number so the citizen can track it later.</div></div>
+
+<div class="qa"><div class="q">Why did you choose PostgreSQL + TypeORM over MongoDB/Mongoose, given many MERN tutorials use Mongo?</div>
+<div class="a">The assessment required it, but it's also the right fit: the domain is highly relational (complaints reference categories, a 3-level geography hierarchy, and users with different roles), and we need strong referential integrity (e.g., you can't assign a complaint to a non-existent user) plus aggregate reporting (GROUP BY for dashboards) — both areas where Postgres + SQL excel over a document store.</div></div>
+
+<div class="qa"><div class="q">What was the hardest part of this project?</div>
+<div class="a">Getting the RBAC model right across three layers consistently — DB-stored permissions (jsonb), Express middleware enforcement, and React route/UI guards — while also adding row-level scoping (e.g., a district_admin can only see their district's complaints, a volunteer only their assigned ones) on top of the coarse-grained permission checks.</div></div>
+
+<div class="qa"><div class="q">How would you explain this project to a non-technical interviewer?</div>
+<div class="a">"It's a digital complaint box for citizens — like filing a pothole report and getting a receipt number to check progress later, while government staff at state/district level see a dashboard of all complaints, assign them to field volunteers, and everything is logged for accountability."</div></div>
+
+<div class="qa"><div class="q">If this had to support all of Andhra Pradesh (millions of complaints), what's the first thing you'd change?</div>
+<div class="a">Add pagination + indexes on frequently filtered columns (status, district_id, category_id, created_at), move from <code>synchronize: true</code> to migrations, add caching (Redis) for dashboard aggregates which don't need to be real-time-accurate, and consider read replicas for the analytics queries so they don't compete with write traffic from complaint submissions.</div></div>
+
+<div class="qa"><div class="q">How did you test that everything actually works end-to-end?</div>
+<div class="a">I ran both dev servers, verified TypeORM connected and synced the schema against a local Postgres instance, ran the seeder to populate roles/users/sample complaints, then hit the API directly with curl: logged in as the seeded super admin, fetched dashboard stats and complaint lists with the JWT, and submitted a brand-new public complaint via multipart form data to confirm the ticket-number generation and tracking endpoint worked end-to-end.</div></div>
+</section>
+
+<!-- 8. Q&A AUTH/RBAC -->
+<section>
+<h1>8. Interview Q&amp;A — Authentication, JWT &amp; RBAC</h1>
+
+<div class="qa"><div class="q">Why two tokens (access + refresh) instead of one long-lived JWT?</div>
+<div class="a">A single long-lived JWT can't be revoked — if stolen, it's valid until expiry. Splitting into a short-lived (15 min) access token (sent in headers, used for API calls) and a long-lived (7 day) refresh token (HttpOnly cookie, used only to mint new access tokens) limits the blast radius of a stolen access token, and the refresh token's server-side record (<code>refresh_tokens</code> table with <code>is_revoked</code>) lets us actually invalidate sessions on logout.</div></div>
+
+<div class="qa"><div class="q">Where do you store the access token on the client, and why?</div>
+<div class="a">In a module-level JS variable inside <code>api/client.ts</code> (in memory), not localStorage/sessionStorage. This avoids exposing it to XSS-based token theft (any injected script reading localStorage). The tradeoff is it's lost on full page reload, which is why <code>AuthContext</code> calls <code>/auth/refresh</code> on mount to silently re-obtain it using the HttpOnly cookie.</div></div>
+
+<div class="qa"><div class="q">Why is the refresh token in a cookie but the access token in a header?</div>
+<div class="a">The refresh token needs to be inaccessible to JavaScript (HttpOnly) since it's the longer-lived, higher-value credential — cookies are the only browser storage that supports HttpOnly. The access token is short-lived and needs to be attached to cross-origin API calls explicitly, which headers do cleanly without CSRF concerns (cookies sent automatically would need CSRF protection).</div></div>
+
+<div class="qa"><div class="q">How does logout actually invalidate a session, given JWTs are stateless?</div>
+<div class="a">Logout looks up the refresh token row in the DB by its value and sets <code>is_revoked = true</code>, then clears the cookie. Any future <code>/auth/refresh</code> call with that token will be rejected (<code>tokenRecord.is_revoked</code> check), so even though the still-valid 15-minute access token could theoretically be replayed until it expires, no new access tokens can be minted — capping exposure to at most 15 minutes.</div></div>
+
+<div class="qa"><div class="q">Explain your RBAC model — roles vs permissions.</div>
+<div class="a">4 roles (<code>super_admin</code>, <code>state_admin</code>, <code>district_admin</code>, <code>volunteer</code>) each map to a <code>permissions</code> jsonb array (e.g., <code>create_complaint</code>, <code>assign_complaint</code>, <code>manage_users</code>, <code>view_dashboard</code>, <code>delete_complaint</code>). At login, the user's role's permissions are embedded into the JWT payload. The <code>authorize(requiredPermissions)</code> middleware checks <code>permissions.every(p =&gt; req.user.permissions.includes(p))</code>, with <code>super_admin</code> as an automatic bypass. This is coarse-grained "can you do X at all" — row-level "which records can you see" is handled separately per-controller using <code>role</code> + <code>districtId</code>/<code>userId</code> from the JWT.</div></div>
+
+<div class="qa"><div class="q">A district_admin tries to view a complaint from another district via <code>GET /api/complaints/:id</code> — what happens?</div>
+<div class="a"><code>getComplaintById</code> fetches the complaint, then checks <code>if (role === "district_admin" && complaint.district.id !== districtId) return 403 Forbidden</code>. Same pattern for volunteers checking <code>complaint.assigned_to.id !== userId</code>. So even with a valid token and a guessable UUID, cross-district/cross-user access is blocked at the controller level — not just hidden in the list view.</div></div>
+
+<div class="qa"><div class="q">How are passwords stored and verified?</div>
+<div class="a"><code>bcrypt.genSalt(10)</code> + <code>bcrypt.hash(password, salt)</code> on register/seed; login uses <code>bcrypt.compare(password, user.password)</code>. Bcrypt's per-hash salt and adjustable cost factor (10 rounds here) make offline brute-forcing of the hash table expensive even if the DB is compromised.</div></div>
+
+<div class="qa"><div class="q">What happens if the access token expires mid-session while the user is active?</div>
+<div class="a">The next API call returns 401 "Access token has expired or is invalid". The axios response interceptor catches this (excluding the login/refresh endpoints themselves to avoid loops), calls <code>/auth/refresh</code> using the HttpOnly cookie, gets a new access token, updates the in-memory token, and <b>transparently retries the original failed request</b> — the user never sees an error. Concurrent requests during the refresh are queued and replayed once the new token arrives.</div></div>
+
+<div class="qa"><div class="q">Is this implementation vulnerable to CSRF?</div>
+<div class="a">The refresh cookie is set with <code>sameSite: "strict"</code>, which prevents the browser from sending it on cross-site requests — that's the primary CSRF mitigation here. The access token is sent via an explicit <code>Authorization</code> header (not a cookie), so it's immune to CSRF by design (CSRF exploits ambient cookie-based auth). In production over HTTPS, <code>secure: true</code> would also be set (currently gated on <code>NODE_ENV === "production"</code>).</div></div>
+</section>
+
+<!-- 9. Q&A DB -->
+<section>
+<h1>9. Interview Q&amp;A — Database &amp; TypeORM</h1>
+
+<div class="qa"><div class="q">Why UUIDs instead of auto-increment integers for primary keys?</div>
+<div class="a">UUIDs avoid leaking sequential information (e.g., guessing how many complaints exist or enumerating ticket IDs), are safe to generate client-side or across distributed services without collision, and work well as opaque public identifiers in URLs (<code>/complaints/:id</code>) without exposing business volume.</div></div>
+
+<div class="qa"><div class="q">How do you ensure each complaint gets a unique, human-friendly ticket number?</div>
+<div class="a">A <code>@BeforeInsert()</code> hook on the <code>Complaint</code> entity generates <code>GRV-{year}-{5-digit-random}</code> if not already set, and the column has a <code>unique</code> constraint at the DB level as a backstop. For the seeder, deterministic incrementing numbers are used instead to guarantee no collisions across the 10 seed rows.</div></div>
+
+<div class="qa"><div class="q">What's the difference between <code>find()</code>/<code>findOne()</code> and <code>createQueryBuilder()</code> in this codebase — when did you use which?</div>
+<div class="a"><code>findOne</code>/<code>find</code> with a <code>relations</code> array are used for simple lookups by ID/email where eager-loading specific relations is enough (e.g., <code>getComplaintById</code>, login). <code>createQueryBuilder</code> is used wherever I need <b>conditional WHERE clauses built dynamically</b> (role-based filters, search, multiple optional query params in <code>listComplaints</code>) or <b>aggregates</b> (<code>GROUP BY</code>/<code>COUNT</code> in the dashboard controller) — things the repository API can't express cleanly.</div></div>
+
+<div class="qa"><div class="q">How do you prevent SQL injection in the search filter (<code>ILIKE '%...%'</code>)?</div>
+<div class="a">TypeORM's QueryBuilder uses <b>parameterized queries</b> — <code>andWhere("complaint.title ILIKE :search", { search: \`%${search}%\` })</code> passes the value as a bound parameter, not string-concatenated SQL, so the driver escapes it safely regardless of special characters in the search term.</div></div>
+
+<div class="qa"><div class="q">Explain the cascade behavior in your geography hierarchy.</div>
+<div class="a"><code>Mandal.district</code> and <code>Village.mandal</code> are <code>ManyToOne</code> with <code>onDelete: CASCADE</code> at the FK level, so deleting a District cascades to delete its Mandals and their Villages. Complaint's FKs to district/mandal/village use <code>NO ACTION</code> (default) — you wouldn't want deleting a village to silently delete historical complaint records, so that's intentionally NOT cascaded.</div></div>
+
+<div class="qa"><div class="q">Why store <code>permissions</code> as jsonb on Role instead of a many-to-many <code>role_permissions</code> join table?</div>
+<div class="a">Permission sets per role are small, static-ish lists checked as a whole at runtime (array membership), not queried relationally (e.g., "find all roles with permission X" isn't a feature). jsonb gives flexibility to add/remove permissions per role without schema migrations, and avoids an extra join on every authenticated request. If permission management became a dynamic admin feature with cross-cutting queries, I'd normalize it into a join table.</div></div>
+
+<div class="qa"><div class="q">What does <code>synchronize: true</code> do and why is it risky in production?</div>
+<div class="a">On every app start, TypeORM diffs the entity definitions against the actual DB schema and auto-applies <code>CREATE TABLE</code>/<code>ALTER TABLE</code> to match — great for rapid iteration (no manual migration writing during development), but in production it can run destructive/unexpected DDL (e.g., dropping a column you renamed) without review. The fix is <code>synchronize: false</code> + TypeORM migrations (<code>migration:generate</code>/<code>migration:run</code>) reviewed and applied deliberately.</div></div>
+
+<div class="qa"><div class="q">How are attachments linked to complaints, and how do you know if a file is an image, PDF, or video?</div>
+<div class="a">Each uploaded file becomes an <code>Attachment</code> row with a <code>complaint</code> FK, <code>file_url</code> (e.g., <code>/uploads/attachments-167...-3.png</code>), <code>file_name</code>, <code>file_size</code>, and <code>file_type</code>. The type is derived server-side from <code>file.mimetype</code> (image/*, video/*, else pdf) at upload time — never trusting a client-supplied type field, which avoids spoofing.</div></div>
+</section>
+
+<!-- 10. Q&A API DESIGN -->
+<section>
+<h1>10. Interview Q&amp;A — API Design, Validation &amp; Error Handling</h1>
+
+<div class="qa"><div class="q">How is input validated, and why Zod specifically?</div>
+<div class="a">Zod schemas (e.g., <code>complaintSchema</code> in <code>complaintController.ts</code>) define type-safe runtime validation: min-length strings, regex for Indian 10-digit mobile numbers starting 6-9, UUID format checks for FK ids, enum checks for priority. <code>safeParse()</code> returns a discriminated result so I can return <code>400</code> with <code>parsed.error.format()</code> (field-level error map) without throwing. Zod is also used on the frontend with React Hook Form's <code>zodResolver</code>, so the same validation "shape" mentally maps between client and server (DRY-ish, even though schemas are currently duplicated rather than shared via a monorepo package).</div></div>
+
+<div class="qa"><div class="q">What's your global error-handling strategy?</div>
+<div class="a">Every controller wraps its logic in try/catch and returns <code>{ success: false, message: error.message }</code> with an appropriate status code (400 validation, 401 auth, 403 forbidden, 404 not found, 500 unexpected). There's also an Express-level global error middleware (last in the chain in <code>index.ts</code>) that catches anything that slips through (e.g., Multer file-filter errors thrown synchronously), logs it server-side, and in development includes the stack trace in the response.</div></div>
+
+<div class="qa"><div class="q">How does the create-complaint endpoint support both logged-in admins and anonymous citizens?</div>
+<div class="a"><code>optionalAuthenticate</code> middleware (vs. the strict <code>authenticate</code>) tries to verify the Bearer token if present but doesn't reject the request if it's missing/invalid — it just leaves <code>req.user</code> undefined. The controller then branches: if <code>req.user</code> exists, <code>created_by</code> is set to that user (admin filing on someone's behalf); otherwise <code>created_by</code> is null and the initial timeline comment is attributed to the system/super-admin account.</div></div>
+
+<div class="qa"><div class="q">How would you version this API if you needed breaking changes later?</div>
+<div class="a">Prefix routes with <code>/api/v2/...</code> mounted alongside <code>/api/v1</code> (current <code>/api</code>), or use a header-based version negotiation. Given the current flat <code>/api/*</code> structure with thin route files per resource, adding a versioned mount point is a low-effort change — each route file is already isolated.</div></div>
+
+<div class="qa"><div class="q">Why return the full <code>permissions</code> array to the client at login instead of just the role name?</div>
+<div class="a">It lets the frontend do instant, network-call-free permission checks (<code>hasPermission()</code> in <code>AuthContext</code>) for conditional rendering — e.g., hiding the "Delete" button for non-super-admins — without re-deriving role→permission mappings on the client (which would duplicate business logic) or making a round trip per UI decision.</div></div>
+</section>
+
+<!-- 11. Q&A REACT -->
+<section>
+<h1>11. Interview Q&amp;A — React &amp; Frontend</h1>
+
+<div class="qa"><div class="q">Why TanStack Query instead of plain <code>useEffect</code> + <code>useState</code> for data fetching?</div>
+<div class="a">TanStack Query gives caching (so switching between Complaints List and Detail doesn't always refetch), automatic background refetching, request deduplication, built-in loading/error states, and easy cache invalidation after mutations (e.g., after assigning a complaint, invalidate the complaints list query so it refreshes). It removes a lot of boilerplate and race-condition bugs that hand-rolled <code>useEffect</code> fetching tends to have.</div></div>
+
+<div class="qa"><div class="q">How does <code>ProtectedRoute</code> work, and how does it differ from backend authorization?</div>
+<div class="a"><code>ProtectedRoute</code> is a layout route component: if <code>loading</code> (auth state still resolving), it shows a spinner; if no <code>user</code>, it <code>&lt;Navigate to="/login"&gt;</code>; if <code>requiredPermissions</code> are passed and <code>hasPermission()</code> fails, it redirects (e.g., to <code>/complaints</code>). This is purely a <b>UX guard</b> — it prevents flicker/unwanted navigation but is not a security boundary; the real enforcement is server-side <code>authorize()</code> middleware, since a user could otherwise hit the API directly.</div></div>
+
+<div class="qa"><div class="q">Why React Hook Form over Formik or controlled state?</div>
+<div class="a">RHF is largely uncontrolled (refs-based), so large forms like the complaint submission form (10+ fields, file inputs, cascading selects) don't re-render on every keystroke — better performance. Combined with <code>zodResolver</code>, validation errors are derived automatically from the same Zod schema used to type the form values.</div></div>
+
+<div class="qa"><div class="q">How do the cascading District → Mandal → Village dropdowns work?</div>
+<div class="a">Districts are fetched once on mount via <code>/api/locations/districts</code>. When a district is selected, a TanStack Query for <code>/api/locations/districts/:id/mandals</code> is enabled (using the <code>enabled</code> option keyed on the selected district id), and similarly mandal selection enables the villages query. Changing the district resets the mandal/village form fields to avoid stale invalid combinations.</div></div>
+
+<div class="qa"><div class="q">How does the Toast/notification UI relate to Socket.io?</div>
+<div class="a"><code>ToastContext</code> exposes a <code>showToast()</code> function. A component subscribed via <code>useSocket()</code> listens for the <code>"notification"</code> event and calls <code>showToast()</code> when one arrives, while <code>NotificationsPage</code> also fetches the persisted list from <code>/api/notifications</code> via TanStack Query — so the same event drives both an ephemeral toast and a durable inbox entry.</div></div>
+
+<div class="qa"><div class="q">What would happen if you removed <code>withCredentials: true</code> from the axios instance?</div>
+<div class="a">The browser would stop sending the HttpOnly refresh-token cookie to the server on <code>/auth/refresh</code> and <code>/auth/login</code> (cookie-setting) requests, breaking silent re-authentication on page reload and effectively forcing users to log in every time they refresh the page.</div></div>
+
+<div class="qa"><div class="q">How is Tailwind configured here, and why utility-first CSS for this project?</div>
+<div class="a"><code>tailwind.config.js</code> + <code>postcss.config.js</code> with the standard content globs over <code>src/**/*.{ts,tsx}</code> for tree-shaking unused classes. For a multi-page admin-style app with many similar card/table/badge layouts (status badges, priority pills), utility classes let me iterate on layout quickly and keep styling co-located with markup, without maintaining a growing separate CSS file per page.</div></div>
+</section>
+
+<!-- 12. Q&A SOCKET -->
+<section>
+<h1>12. Interview Q&amp;A — Real-Time (Socket.io)</h1>
+
+<div class="qa"><div class="q">Why Socket.io rooms instead of broadcasting every event to all connected clients?</div>
+<div class="a">Rooms (<code>user:&lt;id&gt;</code>, <code>district:&lt;id&gt;</code>) let the server target exactly the clients who need an event — a volunteer's assignment notification shouldn't be broadcast to every connected admin in the state. It also reduces bandwidth and avoids leaking information across districts/roles via the socket channel (which would otherwise bypass the REST-layer RBAC entirely).</div></div>
+
+<div class="qa"><div class="q">How does the client join the correct rooms?</div>
+<div class="a">When <code>SocketContext</code> opens a connection (only once <code>user</code> is loaded from <code>AuthContext</code>), it passes <code>userId</code> and <code>districtId</code> as Socket.io handshake <code>query</code> params. The server's connection handler reads <code>socket.handshake.query</code> and calls <code>socket.join(\`user:${userId}\`)</code> and, if present, <code>socket.join(\`district:${districtId}\`)</code>.</div></div>
+
+<div class="qa"><div class="q">Is there any authentication on the socket connection itself?</div>
+<div class="a">Currently the room-join trusts the <code>userId</code>/<code>districtId</code> query params as sent by the client — this is a known simplification. A hardening step would be to pass the JWT access token in the socket handshake (<code>auth</code> option) and verify it server-side before joining rooms, so a malicious client can't simply pass an arbitrary <code>userId</code> to snoop on another user's notifications. Good to proactively mention this as a "if I had more time" security improvement.</div></div>
+
+<div class="qa"><div class="q">What happens to a notification if the recipient is offline when it's created?</div>
+<div class="a"><code>createNotification()</code> always persists a <code>Notification</code> row first (durable), then attempts the Socket.io emit. If nobody is in that <code>user:&lt;id&gt;</code> room, the emit is a no-op — no error, no retry needed — and the user simply sees it next time they open <code>/notifications</code> (or reconnect and the inbox is fetched via REST).</div></div>
+
+<div class="qa"><div class="q">Two events are emitted: <code>"notification"</code> and <code>"complaint:new"</code>. What's the difference?</div>
+<div class="a"><code>"notification"</code> is a personal, persisted inbox item for one specific user (e.g., "you've been assigned ticket X"). <code>"complaint:new"</code> is an ephemeral district-wide broadcast (no DB row) used to let district dashboards/lists live-update when any new complaint lands in their district — more like a "refresh your view" signal than a personal message.</div></div>
+</section>
+
+<!-- 13. Q&A SYSTEM DESIGN -->
+<section>
+<h1>13. Interview Q&amp;A — System Design, Scaling &amp; Bonus Features</h1>
+
+<div class="qa"><div class="q">The brief lists Docker, Swagger, Email, CI/CD, and Background Jobs as bonus. If asked to add one quickly, which would you pick and why?</div>
+<div class="a">Swagger/OpenAPI — the route/controller separation is already clean (one file per resource), so annotating with <code>swagger-jsdoc</code> comments or generating from Zod schemas (<code>zod-to-openapi</code>) is mostly additive, low-risk, and directly satisfies the "API Documentation" deliverable requirement without touching business logic.</div></div>
+
+<div class="qa"><div class="q">How would you add email notifications without blocking the request/response cycle?</div>
+<div class="a">Mirror the existing <code>createNotification()</code> pattern but push to a queue (BullMQ/Redis or even a simple in-process async fire-and-forget with retry) instead of calling an SMTP API synchronously inside the controller — so a slow/failed email provider never delays the complaint-assignment response to the admin.</div></div>
+
+<div class="qa"><div class="q">How would you Dockerize this?</div>
+<div class="a"><code>docker-compose.yml</code> with three services: <code>postgres</code> (official image, volume for data persistence, seeded via the existing <code>npm run seed</code> as an init step), <code>server</code> (multi-stage build: <code>npm ci</code> → <code>tsc</code> → run <code>dist/index.js</code>), and <code>client</code> (Vite build → served via nginx or a static file server). Environment variables map directly from the existing <code>.env.example</code> files, so no code changes needed — just configuration.</div></div>
+
+<div class="qa"><div class="q">How would PDF/Excel export of complaints work?</div>
+<div class="a">A new endpoint (e.g., <code>GET /api/complaints/export?format=pdf|xlsx</code>) reusing the same role-scoped query logic as <code>listComplaints</code>, then piping results through <code>exceljs</code> (Excel) or <code>pdfkit</code>/<code>puppeteer</code> (PDF) to stream a generated file as the response with appropriate <code>Content-Disposition</code> headers — ideally offloaded to a background job for large exports so the HTTP request doesn't time out.</div></div>
+
+<div class="qa"><div class="q">How would you add CI/CD for this repo?</div>
+<div class="a">GitHub Actions workflow on push/PR: install deps for both <code>client</code> and <code>server</code>, run <code>tsc --noEmit</code> for both (type-check gate — already passes cleanly), run any test suites, then on merge to <code>main</code>, build artifacts and deploy (e.g., server to a container host, client static build to a CDN/S3+CloudFront or Vercel/Netlify).</div></div>
+
+<div class="qa"><div class="q">Where are the biggest performance risks as data grows?</div>
+<div class="a">1) <code>listComplaints</code> with no pagination — <code>getMany()</code> on tens of thousands of rows. 2) Eager relations on <code>Complaint</code> causing N+1-ish joins on every fetch even when not needed. 3) Dashboard aggregate queries running against the live transactional table — at scale these should hit a read replica or a materialized/aggregated summary table refreshed periodically. 4) No DB indexes explicitly defined beyond PK/FK/unique — would add composite indexes on <code>(district_id, status)</code> and <code>(category_id, status)</code> for the most common filter combinations.</div></div>
+
+<div class="qa"><div class="q">How would you handle a surge of complaints during, say, a natural disaster?</div>
+<div class="a">The public submission endpoint is the highest-traffic, lowest-trust surface — I'd add rate limiting per IP, possibly a CAPTCHA, and ensure file uploads are streamed to object storage (S3) rather than local disk so the app server stays stateless and horizontally scalable. The Socket.io layer would need a shared adapter (Redis adapter) if running multiple server instances, so room broadcasts reach users connected to any instance.</div></div>
+</section>
+
+<!-- 14. TRICKY -->
+<section>
+<h1>14. Tricky / Code-Specific Questions (Things They Might Probe)</h1>
+
+<div class="qa"><div class="q">In <code>assignComplaint</code>, why must the assignee's district match the complaint's district — and what if a state_admin needs to assign across districts?</div>
+<div class="a">The check <code>if (assignee.district && assignee.district.id !== complaint.district.id) return 400</code> enforces that volunteers/district admins only get work from their own jurisdiction — prevents accidental cross-district misrouting. <code>state_admin</code>/<code>super_admin</code> users have <code>district: null</code>, so that condition is skipped for them entirely (the <code>assignee.district &amp;&amp;</code> guard), meaning HQ-level roles could theoretically be assigned anything — though in practice assignees are filtered to volunteers/district_admins, who do have districts.</div></div>
+
+<div class="qa"><div class="q">In <code>updateComplaint</code>, why does setting status to anything other than "resolved" explicitly null out <code>resolved_at</code>?</div>
+<div class="a">To handle the case where a ticket is marked resolved and then re-opened (status changed back to <code>in_progress</code>) — <code>resolved_at</code> should reflect the <i>current</i> resolution state, not a stale historical timestamp from a previous resolution, which would otherwise make "time to resolve" analytics incorrect.</div></div>
+
+<div class="qa"><div class="q">Why does <code>addUpdate</code> restrict volunteers to only <code>in_progress</code> or <code>resolved</code> status transitions?</div>
+<div class="a">Volunteers are field workers — they shouldn't be able to <code>reject</code> a complaint or set it back to <code>pending</code>/<code>assigned</code> (those are administrative decisions). This enforces a one-directional workflow for the lowest-privilege role while still letting them report progress and completion.</div></div>
+
+<div class="qa"><div class="q">The seeder truncates tables in a specific order — why does order matter, and what would break if reversed?</div>
+<div class="a">Tables are truncated child-first (complaint_updates, assignments, attachments, complaints... down to permissions/categories/districts last) because of FK constraints — even with <code>CASCADE</code> on the TRUNCATE statement, truncating a parent table referenced by a not-yet-truncated child with a restrictive FK would error. Truncating leaf tables first avoids relying on cascade behavior at all.</div></div>
+
+<div class="qa"><div class="q">What would happen if two requests tried to register the same email simultaneously?</div>
+<div class="a">The application-level check (<code>userRepo.findOne({where:{email}})</code> returning existing user → 400) has a race condition window between the check and the insert. The actual safety net is the <code>UNIQUE</code> constraint on <code>users.email</code> at the DB level — the losing request's <code>INSERT</code> would throw a unique-violation error, caught by the try/catch and returned as a 500 (could be improved to detect the specific Postgres error code and return a friendlier 409 Conflict).</div></div>
+
+<div class="qa"><div class="q">Why is <code>citizen_email</code> optional but <code>citizen_phone</code> required and regex-validated?</div>
+<div class="a">Phone is the primary contact/identity channel for most citizens filing civic complaints (more universal than email in this context) and is validated against the Indian mobile number format (<code>^[6-9]\d{9}$</code> — starts 6-9, 10 digits total). Email is a nice-to-have for additional updates, hence <code>.optional().or(z.literal(""))</code> to accept an empty string from the form without failing validation.</div></div>
+
+<div class="qa"><div class="q">The dashboard's <code>getTrend</code> endpoint manually back-fills 6 months of data — why not just return whatever the GROUP BY gives?</div>
+<div class="a">A raw <code>GROUP BY TO_CHAR(created_at,'YYYY-MM')</code> only returns months that actually <i>have</i> complaints — if March had zero complaints, it's simply absent from the result set, which would make a Recharts line graph skip/connect across the gap misleadingly. The code builds a full 6-month <code>monthNames</code> scaffold and fills in <code>0</code> for any month missing from <code>trendMap</code>, guaranteeing a continuous x-axis.</div></div>
+
+<div class="qa"><div class="q">Why does <code>createComplaint</code> attribute the initial timeline comment to "admin@grievance.com" when the submitter is anonymous?</div>
+<div class="a"><code>ComplaintUpdate.updated_by</code> is a required (non-nullable) relation to <code>User</code> — every timeline entry needs an actor for audit consistency. Since anonymous citizens aren't <code>User</code> records, the system falls back to the seeded super-admin account as a "system" actor for that first auto-generated "Complaint successfully registered" entry. An alternative would be making <code>updated_by</code> nullable with a separate "system-generated" flag, but that would require an entity/migration change.</div></div>
+
+<div class="qa"><div class="q">What's the significance of <code>optional().or(z.literal(""))</code> appearing on <code>village_id</code> and <code>citizen_email</code>?</div>
+<div class="a">HTML forms submit empty <code>&lt;select&gt;</code>/<code>&lt;input&gt;</code> values as empty strings <code>""</code>, not <code>undefined</code>. Zod's <code>.optional()</code> alone only accepts <code>undefined</code> — without <code>.or(z.literal(""))</code>, an unselected village or blank email field would fail the UUID/email format validation. This pattern bridges "HTML form empty value" with "Zod optional field" semantics.</div></div>
+
+<div class="qa"><div class="q">If I gave you a JWT and asked you to explain exactly what's inside it for this app, what would you say?</div>
+<div class="a">Header (alg HS256, typ JWT), payload = <code>UserSessionPayload</code>: <code>{ id, email, role, permissions: string[], districtId: string|null, iat, exp }</code> — no password or refresh-token data ever goes into the JWT. Signature is HMAC-SHA256 using <code>JWT_SECRET</code> (separate from <code>JWT_REFRESH_SECRET</code> used for refresh tokens, so compromising one secret doesn't compromise the other token type).</div></div>
+</section>
+
+</body>
+</html>

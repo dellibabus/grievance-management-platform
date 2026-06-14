@@ -10,8 +10,6 @@ import dotenv from "dotenv";
 // Configurations & Database Source
 dotenv.config();
 import { AppDataSource } from "./config/data-source";
-import { Role } from "./entities/Role";
-import { runSeeder } from "./config/seeder";
 
 // Services & Routers
 import { setIoInstance } from "./services/socketService";
@@ -108,18 +106,6 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 AppDataSource.initialize()
   .then(async () => {
     console.log("TypeORM Database connected successfully.");
-
-    // Auto-run seeding on empty database
-    try {
-      const roleRepo = AppDataSource.getRepository(Role);
-      const count = await roleRepo.count();
-      if (count === 0) {
-        console.log("No data found in roles table. Triggering auto-seed process...");
-        await runSeeder();
-      }
-    } catch (seedErr) {
-      console.error("Auto-seeding encountered errors:", seedErr);
-    }
 
     server.listen(PORT, () => {
       console.log(`Grievance Management Server running on port ${PORT}`);

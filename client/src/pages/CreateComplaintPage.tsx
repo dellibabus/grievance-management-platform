@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiClient } from "../api/client";
 import { useToast } from "../context/ToastContext";
 import { ArrowLeft, Upload, AlertCircle } from "lucide-react";
+import { CustomSelect } from "../components/CustomSelect";
 
 export const CreateComplaintPage: React.FC = () => {
   const navigate = useNavigate();
@@ -46,6 +47,11 @@ export const CreateComplaintPage: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    setFormData(p => ({ ...p, [name]: value }));
+    if (errors[name]) setErrors(p => { const c = { ...p }; delete c[name]; return c; });
+  };
+
+  const setField = (name: string, value: string) => {
     setFormData(p => ({ ...p, [name]: value }));
     if (errors[name]) setErrors(p => { const c = { ...p }; delete c[name]; return c; });
   };
@@ -142,20 +148,26 @@ export const CreateComplaintPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className={labelClass}>Category *</label>
-                <select name="category_id" value={formData.category_id} onChange={handleChange} className={inputClass}>
-                  <option value="">Select Category</option>
-                  {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
+                <CustomSelect
+                  value={formData.category_id}
+                  onChange={(v) => setField("category_id", v)}
+                  placeholder="Select Category"
+                  options={categories.map(c => ({ value: c.id, label: c.name }))}
+                />
                 {errors.category_id && <span className={errClass}>{errors.category_id}</span>}
               </div>
               <div>
                 <label className={labelClass}>Priority Level</label>
-                <select name="priority" value={formData.priority} onChange={handleChange} className={inputClass}>
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                  <option value="critical">Critical</option>
-                </select>
+                <CustomSelect
+                  value={formData.priority}
+                  onChange={(v) => setField("priority", v)}
+                  options={[
+                    { value: "low", label: "Low" },
+                    { value: "medium", label: "Medium" },
+                    { value: "high", label: "High" },
+                    { value: "critical", label: "Critical" }
+                  ]}
+                />
               </div>
             </div>
           </div>
@@ -167,26 +179,34 @@ export const CreateComplaintPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className={labelClass}>District *</label>
-              <select name="district_id" value={formData.district_id} onChange={handleChange} className={inputClass}>
-                <option value="">Select District</option>
-                {districts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-              </select>
+              <CustomSelect
+                value={formData.district_id}
+                onChange={(v) => setField("district_id", v)}
+                placeholder="Select District"
+                options={districts.map(d => ({ value: d.id, label: d.name }))}
+              />
               {errors.district_id && <span className={errClass}>{errors.district_id}</span>}
             </div>
             <div>
               <label className={labelClass}>Mandal *</label>
-              <select name="mandal_id" value={formData.mandal_id} onChange={handleChange} disabled={!formData.district_id} className={`${inputClass} disabled:opacity-40`}>
-                <option value="">Select Mandal</option>
-                {mandals.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-              </select>
+              <CustomSelect
+                value={formData.mandal_id}
+                onChange={(v) => setField("mandal_id", v)}
+                placeholder="Select Mandal"
+                disabled={!formData.district_id}
+                options={mandals.map(m => ({ value: m.id, label: m.name }))}
+              />
               {errors.mandal_id && <span className={errClass}>{errors.mandal_id}</span>}
             </div>
             <div>
               <label className={labelClass}>Village</label>
-              <select name="village_id" value={formData.village_id} onChange={handleChange} disabled={!formData.mandal_id} className={`${inputClass} disabled:opacity-40`}>
-                <option value="">Select Village</option>
-                {villages.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
-              </select>
+              <CustomSelect
+                value={formData.village_id}
+                onChange={(v) => setField("village_id", v)}
+                placeholder="Select Village"
+                disabled={!formData.mandal_id}
+                options={villages.map(v => ({ value: v.id, label: v.name }))}
+              />
             </div>
           </div>
         </div>

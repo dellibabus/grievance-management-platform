@@ -143,7 +143,53 @@ export async function runSeeder() {
   // 4. Seed Districts, Mandals, and Villages
   const locationData = [
     {
+      district: "Hyderabad",
+      state: "Telangana",
+      mandals: [
+        { name: "Secunderabad", villages: ["Marredpally", "Trimulgherry", "Bowenpally"] },
+        { name: "Khairatabad", villages: ["Banjara Hills", "Ameerpet", "Somajiguda"] },
+        { name: "Charminar", villages: ["Falaknuma", "Chandrayangutta", "Bahadurpura"] }
+      ]
+    },
+    {
+      district: "Rangareddy",
+      state: "Telangana",
+      mandals: [
+        { name: "Serilingampally", villages: ["Gachibowli", "Madhapur", "Kondapur"] },
+        { name: "LB Nagar", villages: ["Vanasthalipuram", "Hayathnagar", "Saroornagar"] },
+        { name: "Shamshabad", villages: ["Shamshabad", "Rajendranagar", "Chevella"] }
+      ]
+    },
+    {
+      district: "Medchal-Malkajgiri",
+      state: "Telangana",
+      mandals: [
+        { name: "Kukatpally", villages: ["KPHB Colony", "Nizampet", "Bachupally"] },
+        { name: "Malkajgiri", villages: ["Safilguda", "Neredmet", "ECIL"] },
+        { name: "Quthbullapur", villages: ["Suchitra", "Jeedimetla", "Balanagar"] }
+      ]
+    },
+    {
+      district: "Warangal Urban",
+      state: "Telangana",
+      mandals: [
+        { name: "Hanamkonda", villages: ["Kakatiya Nagar", "Subedari", "Mathwada"] },
+        { name: "Warangal", villages: ["Kishanpura", "Ramnagar", "Bhadrakali"] },
+        { name: "Kazipet", villages: ["Kazipet Town", "Bheemaram", "Sangem"] }
+      ]
+    },
+    {
+      district: "Karimnagar",
+      state: "Telangana",
+      mandals: [
+        { name: "Karimnagar Urban", villages: ["Christianpet", "Mukarampura", "Bhagat Nagar"] },
+        { name: "Husnabad", villages: ["Husnabad Town", "Akkapally", "Ramadugu"] },
+        { name: "Jammikunta", villages: ["Jammikunta Town", "Elgandal", "Veenavanka"] }
+      ]
+    },
+    {
       district: "Visakhapatnam",
+      state: "Andhra Pradesh",
       mandals: [
         { name: "Bheemunipatnam", villages: ["Thagarapuvalasa", "Nallarekula", "Bheemili"] },
         { name: "Anandapuram", villages: ["Vellanki", "Gidijala", "Anandapuram"] },
@@ -152,6 +198,7 @@ export async function runSeeder() {
     },
     {
       district: "Guntur",
+      state: "Andhra Pradesh",
       mandals: [
         { name: "Guntur Urban", villages: ["Nallapadu", "Adavitakkellapadu", "Gorantla"] },
         { name: "Tenali", villages: ["Tenali Rural", "Pinapadu", "Angalakuduru"] },
@@ -160,6 +207,7 @@ export async function runSeeder() {
     },
     {
       district: "Krishna",
+      state: "Andhra Pradesh",
       mandals: [
         { name: "Vijayawada Urban", villages: ["Gunadala", "Patamata", "Singh Nagar"] },
         { name: "Gannavaram", villages: ["Savajigudem", "Buddhavaram", "Kesarapalle"] },
@@ -168,6 +216,7 @@ export async function runSeeder() {
     },
     {
       district: "Nellore",
+      state: "Andhra Pradesh",
       mandals: [
         { name: "Nellore Urban", villages: ["Kallurupalli", "Podalakur Road", "Buja Buja Nellore"] },
         { name: "Kavali", villages: ["Kavali Rural", "Maddurupadu", "Rudrakota"] },
@@ -176,6 +225,7 @@ export async function runSeeder() {
     },
     {
       district: "Chittoor",
+      state: "Andhra Pradesh",
       mandals: [
         { name: "Chittoor Urban", villages: ["Murakambattu", "Ganganapalle", "Kondamitta"] },
         { name: "Tirupati Rural", villages: ["Avilala", "Mallvaram", "Tummalagunta"] },
@@ -191,7 +241,7 @@ export async function runSeeder() {
   for (const dData of locationData) {
     const dist = new District();
     dist.name = dData.district;
-    dist.state = "Andhra Pradesh";
+    dist.state = dData.state;
     const savedDist = await AppDataSource.getRepository(District).save(dist);
     districtsMap[dData.district] = savedDist;
 

@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import { apiClient } from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import { CustomSelect } from "../components/CustomSelect";
 import {
   Search,
   Filter,
@@ -11,7 +15,13 @@ import {
   AlertTriangle,
   FolderOpen,
   MapPin,
-  Tag
+  Tag,
+  LayoutGrid,
+  Table2,
+  FileSpreadsheet,
+  FileDown,
+  CheckSquare,
+  Square
 } from "lucide-react";
 
 export const ComplaintsListPage: React.FC = () => {
@@ -27,6 +37,10 @@ export const ComplaintsListPage: React.FC = () => {
   // Location filter options
   const [categories, setCategories] = useState<any[]>([]);
   const [districts, setDistricts] = useState<any[]>([]);
+
+  // View mode & row selection (for table view + export)
+  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   // Fetch categories & districts
   useEffect(() => {
@@ -54,7 +68,8 @@ export const ComplaintsListPage: React.FC = () => {
 
       const res = await apiClient.get(`/complaints?${params.toString()}`);
       return res.data;
-    }
+    },
+    refetchInterval: 15_000
   });
 
   const complaints = data?.complaints || [];
@@ -93,6 +108,76 @@ export const ComplaintsListPage: React.FC = () => {
     );
   };
 
+  // Toggle a single row's selection
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  // Toggle select-all (current filtered list)
+  const toggleSelectAll = () => {
+    setSelectedIds((prev) => {
+      if (prev.size === complaints.length) return new Set();
+      return new Set(complaints.map((c: any) => c.id));
+    });
+  };
+
+  // Resolve which rows to export: selected rows if any, else all filtered rows
+  const getExportRows = () => {
+    const source = selectedIds.size > 0
+      ? complaints.filter((c: any) => selectedIds.has(c.id))
+      : complaints;
+
+    return source.map((c: any) => ({
+      Ticket: c.ticket_number,
+      Title: c.title,
+      Status: c.status?.replace("_", " "),
+      Priority: c.priority,
+      Category: c.category?.name || "",
+      District: c.district?.name || "",
+      Mandal: c.mandal?.name || "",
+      Village: c.village?.name || "",
+      Citizen: c.citizen_name,
+      Phone: c.citizen_phone,
+      Assignee: c.assigned_to?.name || "Unassigned",
+      "Filed On": new Date(c.created_at).toLocaleDateString()
+    }));
+  };
+
+  const exportExcel = () => {
+    const rows = getExportRows();
+    if (rows.length === 0) return;
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Complaints");
+    XLSX.writeFile(workbook, `grievance_report_${rows.length}.xlsx`);
+  };
+
+  const exportPDF = () => {
+    const rows = getExportRows();
+    if (rows.length === 0) return;
+
+    const doc = new jsPDF({ orientation: "landscape" });
+    doc.setFontSize(14);
+    doc.text("Grievance Report", 14, 12);
+    doc.setFontSize(9);
+    doc.text(`Generated: ${new Date().toLocaleString()} | Records: ${rows.length}`, 14, 18);
+
+    autoTable(doc, {
+      startY: 24,
+      head: [["Ticket", "Title", "Status", "Priority", "Category", "District", "Mandal", "Village", "Citizen", "Phone", "Assignee", "Filed On"]],
+      body: rows.map((r: Record<string, any>) => Object.values(r)),
+      styles: { fontSize: 7, cellPadding: 2 },
+      headStyles: { fillColor: [37, 99, 235] }
+    });
+
+    doc.save(`grievance_report_${rows.length}.pdf`);
+  };
+
   return (
     <div className="flex flex-col gap-6">
       {/* Page Header */}
@@ -101,13 +186,57 @@ export const ComplaintsListPage: React.FC = () => {
           <h1 className="text-2xl font-bold tracking-tight text-white">Grievance Inbox</h1>
           <p className="text-xs text-slate-400 mt-1">Review, track, and assign incoming complaints.</p>
         </div>
-        <Link
-          to="/complaints/new"
-          className="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs py-2.5 px-4 rounded-xl flex items-center gap-2 shadow-md shadow-blue-600/10 transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          <span>New Grievance</span>
-        </Link>
+        <div className="flex items-center gap-2">
+          {/* View mode toggle */}
+          <div className="flex items-center bg-slate-950 border border-slate-850 rounded-xl p-1">
+            <button
+              type="button"
+              onClick={() => setViewMode("table")}
+              title="Table view"
+              className={`p-1.5 rounded-lg transition-colors ${viewMode === "table" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-slate-200"}`}
+            >
+              <Table2 className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("grid")}
+              title="Grid view"
+              className={`p-1.5 rounded-lg transition-colors ${viewMode === "grid" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-slate-200"}`}
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Export buttons */}
+          <button
+            type="button"
+            onClick={exportExcel}
+            disabled={complaints.length === 0}
+            title={selectedIds.size > 0 ? `Export ${selectedIds.size} selected to Excel` : "Export all to Excel"}
+            className="bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-900/35 text-emerald-400 font-semibold text-xs py-2.5 px-3 rounded-xl flex items-center gap-2 transition-colors disabled:opacity-40"
+          >
+            <FileSpreadsheet className="h-4 w-4" />
+            <span>Excel{selectedIds.size > 0 ? ` (${selectedIds.size})` : ""}</span>
+          </button>
+          <button
+            type="button"
+            onClick={exportPDF}
+            disabled={complaints.length === 0}
+            title={selectedIds.size > 0 ? `Export ${selectedIds.size} selected to PDF` : "Export all to PDF"}
+            className="bg-red-950/40 hover:bg-red-900/50 border border-red-900/35 text-red-400 font-semibold text-xs py-2.5 px-3 rounded-xl flex items-center gap-2 transition-colors disabled:opacity-40"
+          >
+            <FileDown className="h-4 w-4" />
+            <span>PDF{selectedIds.size > 0 ? ` (${selectedIds.size})` : ""}</span>
+          </button>
+
+          <Link
+            to="/complaints/new"
+            className="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs py-2.5 px-4 rounded-xl flex items-center gap-2 shadow-md shadow-blue-600/10 transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            <span>New Grievance</span>
+          </Link>
+        </div>
       </div>
 
       {/* Filters Segment */}
@@ -131,57 +260,57 @@ export const ComplaintsListPage: React.FC = () => {
           </div>
 
           {/* Status */}
-          <select
+          <CustomSelect
             value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="bg-slate-950 border border-slate-850 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 text-slate-300"
-          >
-            <option value="">All Statuses</option>
-            <option value="pending">Pending Review</option>
-            <option value="assigned">Assigned</option>
-            <option value="in_progress">In Progress</option>
-            <option value="resolved">Resolved</option>
-            <option value="closed">Closed</option>
-            <option value="rejected">Rejected</option>
-          </select>
+            onChange={setStatus}
+            placeholder="All Statuses"
+            options={[
+              { value: "", label: "All Statuses" },
+              { value: "pending", label: "Pending Review" },
+              { value: "assigned", label: "Assigned" },
+              { value: "in_progress", label: "In Progress" },
+              { value: "resolved", label: "Resolved" },
+              { value: "closed", label: "Closed" },
+              { value: "rejected", label: "Rejected" }
+            ]}
+          />
 
           {/* Priority */}
-          <select
+          <CustomSelect
             value={priority}
-            onChange={(e) => setPriority(e.target.value)}
-            className="bg-slate-950 border border-slate-850 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 text-slate-300"
-          >
-            <option value="">All Priorities</option>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-            <option value="critical">Critical</option>
-          </select>
+            onChange={setPriority}
+            placeholder="All Priorities"
+            options={[
+              { value: "", label: "All Priorities" },
+              { value: "low", label: "Low" },
+              { value: "medium", label: "Medium" },
+              { value: "high", label: "High" },
+              { value: "critical", label: "Critical" }
+            ]}
+          />
 
           {/* Category */}
-          <select
+          <CustomSelect
             value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-            className="bg-slate-950 border border-slate-850 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 text-slate-300"
-          >
-            <option value="">All Categories</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
+            onChange={setCategoryId}
+            placeholder="All Categories"
+            options={[
+              { value: "", label: "All Categories" },
+              ...categories.map((c) => ({ value: c.id, label: c.name }))
+            ]}
+          />
 
           {/* District (Admins only) */}
           {(user?.role === "super_admin" || user?.role === "state_admin") ? (
-            <select
+            <CustomSelect
               value={districtId}
-              onChange={(e) => setDistrictId(e.target.value)}
-              className="bg-slate-950 border border-slate-850 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 text-slate-300"
-            >
-              <option value="">All Districts</option>
-              {districts.map((d) => (
-                <option key={d.id} value={d.id}>{d.name}</option>
-              ))}
-            </select>
+              onChange={setDistrictId}
+              placeholder="All Districts"
+              options={[
+                { value: "", label: "All Districts" },
+                ...districts.map((d) => ({ value: d.id, label: d.name }))
+              ]}
+            />
           ) : (
             <div className="bg-slate-900 border border-slate-850 rounded-xl px-3 py-2 text-xs text-slate-400 flex items-center justify-between">
               <span>District Scoped</span>
@@ -191,7 +320,7 @@ export const ComplaintsListPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Grid List */}
+      {/* Results */}
       {isLoading ? (
         <div className="flex justify-center items-center py-16">
           <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
@@ -201,6 +330,80 @@ export const ComplaintsListPage: React.FC = () => {
           <FolderOpen className="h-10 w-10 text-slate-500 mx-auto mb-4" />
           <h3 className="font-bold text-slate-300">No Grievances Found</h3>
           <p className="text-xs text-slate-450 mt-1">Try refining your filter parameters or search term.</p>
+        </div>
+      ) : viewMode === "table" ? (
+        <div className="glassmorphism rounded-2xl overflow-hidden border-slate-850">
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="bg-slate-900/60 border-b border-slate-800">
+                  <th className="py-3.5 px-4 w-10">
+                    <button type="button" onClick={toggleSelectAll} className="text-slate-400 hover:text-blue-400 transition-colors flex items-center">
+                      {selectedIds.size === complaints.length ? (
+                        <CheckSquare className="h-4 w-4 text-blue-500" />
+                      ) : (
+                        <Square className="h-4 w-4" />
+                      )}
+                    </button>
+                  </th>
+                  {["Ticket", "Title", "Status", "Priority", "Category", "Location", "Assignee", "Filed On"].map((h) => (
+                    <th key={h} className="text-left py-3.5 px-4 font-semibold text-slate-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-900">
+                {complaints.map((c: any) => (
+                  <tr key={c.id} className="hover:bg-slate-900/40 transition-colors">
+                    <td className="py-3 px-4">
+                      <button type="button" onClick={() => toggleSelect(c.id)} className="text-slate-400 hover:text-blue-400 transition-colors flex items-center">
+                        {selectedIds.has(c.id) ? (
+                          <CheckSquare className="h-4 w-4 text-blue-500" />
+                        ) : (
+                          <Square className="h-4 w-4" />
+                        )}
+                      </button>
+                    </td>
+                    <td className="py-3 px-4">
+                      <Link to={`/complaints/${c.id}`} className="font-mono text-xs font-bold text-blue-400 bg-blue-950/40 border border-blue-900/40 py-0.5 px-2 rounded-md hover:underline whitespace-nowrap">
+                        {c.ticket_number}
+                      </Link>
+                    </td>
+                    <td className="py-3 px-4 max-w-[220px]">
+                      <Link to={`/complaints/${c.id}`} className="text-slate-200 font-medium hover:text-blue-400 transition-colors line-clamp-1">
+                        {c.title}
+                      </Link>
+                    </td>
+                    <td className="py-3 px-4">{getStatusBadge(c.status)}</td>
+                    <td className="py-3 px-4">{getPriorityBadge(c.priority)}</td>
+                    <td className="py-3 px-4 text-slate-300 whitespace-nowrap">
+                      <div className="flex items-center gap-1.5">
+                        <Tag className="h-3.5 w-3.5 text-blue-500 shrink-0" />
+                        <span>{c.category?.name}</span>
+                      </div>
+                    </td>
+                    <td className="py-3 px-4 text-slate-400 max-w-[200px]">
+                      <div className="flex items-center gap-1.5">
+                        <MapPin className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                        <span className="truncate">
+                          {c.village?.name ? `${c.village.name}, ` : ""}
+                          {c.mandal?.name}, {c.district?.name}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-3 px-4 text-slate-300 whitespace-nowrap">
+                      {c.assigned_to ? c.assigned_to.name : "Unassigned"}
+                    </td>
+                    <td className="py-3 px-4 text-slate-400 whitespace-nowrap">
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="h-3.5 w-3.5 text-slate-500 shrink-0" />
+                        <span>{new Date(c.created_at).toLocaleDateString()}</span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4">

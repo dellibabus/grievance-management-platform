@@ -20,6 +20,8 @@ import {
   Trash2,
   ExternalLink
 } from "lucide-react";
+import { ConfirmModal } from "../components/ConfirmModal";
+import { CustomSelect } from "../components/CustomSelect";
 
 export const ComplaintDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -33,6 +35,7 @@ export const ComplaintDetailPage: React.FC = () => {
   
   const [assigneeId, setAssigneeId] = useState("");
   const [assignNotes, setAssignNotes] = useState("");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // 1. Fetch complaint details
   const { data, isLoading, isError } = useQuery({
@@ -105,10 +108,13 @@ export const ComplaintDetailPage: React.FC = () => {
     },
     onSuccess: () => {
       showToast("Ticket Deleted", "Complaint was deleted successfully.", "success");
+      queryClient.removeQueries({ queryKey: ["complaint", id] });
+      queryClient.invalidateQueries({ queryKey: ["complaints"] });
       navigate("/complaints");
     },
     onError: (err: any) => {
       showToast("Deletion Failed", err.response?.data?.message || "Failed to delete complaint.", "error");
+      setShowDeleteConfirm(false);
     }
   });
 
@@ -152,9 +158,7 @@ export const ComplaintDetailPage: React.FC = () => {
   };
 
   const handleDelete = () => {
-    if (window.confirm("Are you sure you want to permanently delete this complaint ticket?")) {
-      deleteMutation.mutate();
-    }
+    setShowDeleteConfirm(true);
   };
 
   // Badge styler helpers
@@ -384,17 +388,12 @@ export const ComplaintDetailPage: React.FC = () => {
               <form onSubmit={handleAssignSubmit} className="flex flex-col gap-3.5">
                 <div>
                   <label className="block text-[10px] text-slate-400 mb-1">Select Assignee</label>
-                  <select
-                    required
+                  <CustomSelect
                     value={assigneeId}
-                    onChange={(e) => setAssigneeId(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 text-slate-300"
-                  >
-                    <option value="">Choose Volunteer</option>
-                    {volunteers.map((v: any) => (
-                      <option key={v.id} value={v.id}>{v.name} ({v.phone})</option>
-                    ))}
-                  </select>
+                    onChange={setAssigneeId}
+                    placeholder="Choose Volunteer"
+                    options={volunteers.map((v: any) => ({ value: v.id, label: `${v.name} (${v.phone})` }))}
+                  />
                 </div>
 
                 <div>
@@ -429,28 +428,28 @@ export const ComplaintDetailPage: React.FC = () => {
             <form onSubmit={handleUpdateSubmit} className="flex flex-col gap-3.5">
               <div>
                 <label className="block text-[10px] text-slate-400 mb-1">Update Status (Optional)</label>
-                <select
+                <CustomSelect
                   value={updateStatus}
-                  onChange={(e) => setUpdateStatus(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 text-slate-300"
-                >
-                  <option value="">Keep Current Status</option>
-                  {user?.role === "volunteer" ? (
-                    <>
-                      <option value="in_progress">In Progress</option>
-                      <option value="resolved">Resolved</option>
-                    </>
-                  ) : (
-                    <>
-                      <option value="pending">Pending</option>
-                      <option value="assigned">Assigned</option>
-                      <option value="in_progress">In Progress</option>
-                      <option value="resolved">Resolved</option>
-                      <option value="closed">Closed</option>
-                      <option value="rejected">Rejected</option>
-                    </>
-                  )}
-                </select>
+                  onChange={setUpdateStatus}
+                  placeholder="Keep Current Status"
+                  options={
+                    user?.role === "volunteer"
+                      ? [
+                          { value: "", label: "Keep Current Status" },
+                          { value: "in_progress", label: "In Progress" },
+                          { value: "resolved", label: "Resolved" }
+                        ]
+                      : [
+                          { value: "", label: "Keep Current Status" },
+                          { value: "pending", label: "Pending" },
+                          { value: "assigned", label: "Assigned" },
+                          { value: "in_progress", label: "In Progress" },
+                          { value: "resolved", label: "Resolved" },
+                          { value: "closed", label: "Closed" },
+                          { value: "rejected", label: "Rejected" }
+                        ]
+                  }
+                />
               </div>
 
               <div>
@@ -477,6 +476,17 @@ export const ComplaintDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        title="Delete Grievance Ticket"
+        message={`Are you sure you want to permanently delete ticket ${complaint.ticket_number}? This action cannot be undone.`}
+        confirmLabel="Delete"
+        danger
+        loading={deleteMutation.isPending}
+        onConfirm={() => deleteMutation.mutate()}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
     </div>
   );
 };

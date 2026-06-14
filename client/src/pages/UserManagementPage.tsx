@@ -4,6 +4,8 @@ import { apiClient } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { Plus, Pencil, Trash2, X, Check } from "lucide-react";
+import { ConfirmModal } from "../components/ConfirmModal";
+import { CustomSelect } from "../components/CustomSelect";
 
 export const UserManagementPage: React.FC = () => {
   const { user: currentUser } = useAuth();
@@ -12,6 +14,7 @@ export const UserManagementPage: React.FC = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
+  const [deleteTarget, setDeleteTarget] = useState<any>(null);
   const [form, setForm] = useState({ name: "", email: "", password: "", phone: "", roleName: "volunteer", districtId: "" });
 
   const { data: usersData, isLoading } = useQuery({
@@ -43,8 +46,13 @@ export const UserManagementPage: React.FC = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => { const r = await apiClient.delete(`/users/${id}`); return r.data; },
-    onSuccess: () => { showToast("User Deleted", "User account removed.", "success"); queryClient.invalidateQueries({ queryKey: ["users"] }); },
-    onError: (e: any) => showToast("Error", e.response?.data?.message || "Failed to delete user.", "error")
+    onSuccess: (_data, id) => {
+      showToast("User Deleted", "User account removed.", "success");
+      queryClient.setQueryData(["users"], (old: any[] | undefined) => old?.filter((u) => u.id !== id));
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      setDeleteTarget(null);
+    },
+    onError: (e: any) => { showToast("Error", e.response?.data?.message || "Failed to delete user.", "error"); setDeleteTarget(null); }
   });
 
   const resetForm = () => setForm({ name: "", email: "", password: "", phone: "", roleName: "volunteer", districtId: "" });
@@ -62,9 +70,9 @@ export const UserManagementPage: React.FC = () => {
     else { createMutation.mutate({ ...payload, email: form.email, password: form.password }); }
   };
 
-  const handleDelete = (id: string) => {
-    if (id === currentUser?.id) { showToast("Not Allowed", "Cannot delete your own account.", "warning"); return; }
-    if (window.confirm("Delete this user account?")) deleteMutation.mutate(id);
+  const handleDelete = (u: any) => {
+    if (u.id === currentUser?.id) { showToast("Not Allowed", "Cannot delete your own account.", "warning"); return; }
+    setDeleteTarget(u);
   };
 
   const roleColorMap: Record<string, string> = {
@@ -131,7 +139,7 @@ export const UserManagementPage: React.FC = () => {
                           <Pencil className="h-3.5 w-3.5" />
                         </button>
                         {currentUser?.role === "super_admin" && u.id !== currentUser.id && (
-                          <button onClick={() => handleDelete(u.id)} className="p-1.5 text-slate-500 hover:text-red-400 transition-colors rounded-lg hover:bg-red-950/30">
+                          <button onClick={() => handleDelete(u)} className="p-1.5 text-slate-500 hover:text-red-400 transition-colors rounded-lg hover:bg-red-950/30">
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>
                         )}
@@ -177,16 +185,24 @@ export const UserManagementPage: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-slate-400 font-semibold mb-1">Role *</label>
-                  <select value={form.roleName} onChange={e => setForm(p => ({ ...p, roleName: e.target.value }))} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 text-slate-300">
-                    {rolesData?.map((r: any) => <option key={r.id} value={r.name}>{r.name.replace("_", " ")}</option>)}
-                  </select>
+                  <CustomSelect
+                    value={form.roleName}
+                    onChange={(v) => setForm(p => ({ ...p, roleName: v }))}
+                    placeholder="Select role"
+                    options={rolesData?.map((r: any) => ({ value: r.name, label: r.name.replace("_", " ") })) || []}
+                  />
                 </div>
                 <div>
                   <label className="block text-slate-400 font-semibold mb-1">District</label>
-                  <select value={form.districtId} onChange={e => setForm(p => ({ ...p, districtId: e.target.value }))} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 text-slate-300">
-                    <option value="">None (State Level)</option>
-                    {districtsData?.map((d: any) => <option key={d.id} value={d.id}>{d.name}</option>)}
-                  </select>
+                  <CustomSelect
+                    value={form.districtId}
+                    onChange={(v) => setForm(p => ({ ...p, districtId: v }))}
+                    placeholder="None (State Level)"
+                    options={[
+                      { value: "", label: "None (State Level)" },
+                      ...(districtsData?.map((d: any) => ({ value: d.id, label: d.name })) || [])
+                    ]}
+                  />
                 </div>
               </div>
               <div className="flex gap-3 pt-2">
@@ -199,6 +215,17 @@ export const UserManagementPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        title="Delete User Account"
+        message={`Are you sure you want to permanently delete "${deleteTarget?.name}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        danger
+        loading={deleteMutation.isPending}
+        onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 };
