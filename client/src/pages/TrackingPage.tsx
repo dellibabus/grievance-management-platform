@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { apiClient } from "../api/client";
 import {
-  FileText,
   Search,
   ChevronLeft,
   AlertCircle,
@@ -195,8 +194,8 @@ export const TrackingPage: React.FC = () => {
                         {/* Bullet node */}
                         <div
                           className={`absolute -left-[31px] top-0.5 h-4 w-4 rounded-full border-2 bg-slate-950 flex items-center justify-center ${isLast
-                              ? "border-blue-500 ring-4 ring-blue-500/25 animate-pulse"
-                              : "border-slate-800"
+                            ? "border-blue-500 ring-4 ring-blue-500/25 animate-pulse"
+                            : "border-slate-800"
                             }`}
                         >
                           {isLast && <div className="h-1.5 w-1.5 rounded-full bg-blue-500"></div>}
