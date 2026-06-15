@@ -11,7 +11,6 @@ import {
   LogOut,
   Menu,
   X,
-  FileText,
   ShieldAlert,
   KeyRound
 } from "lucide-react";
@@ -102,7 +101,6 @@ export const Layout: React.FC = () => {
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="hidden md:flex items-center gap-3 mb-8 px-2 shrink-0">
-            <FileText className="h-7 w-7 text-blue-500 animate-pulse" />
             <span className="font-extrabold text-xl tracking-wider bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
               Grievance
             </span>
@@ -145,7 +143,7 @@ export const Layout: React.FC = () => {
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto bg-slate-950">
         {/* Top Navbar */}
-        <header className="hidden md:flex bg-slate-900/40 border-b border-slate-850 p-4 justify-between items-center sticky top-0 backdrop-blur-md z-20">
+        <header className="hidden md:flex bg-slate-900/40 border-b border-slate-850 p-4 justify-between items-center sticky top-0 backdrop-blur-md z-30">
           <div className="flex items-center gap-4">
             <h2 className="text-sm text-slate-400">
               Welcome back, <span className="text-slate-100 font-semibold">{user?.name}</span>
@@ -164,7 +162,7 @@ export const Layout: React.FC = () => {
               </Link>
 
               {/* Hover dropdown card */}
-              <div className="absolute right-0 top-full mt-2 w-64 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-4 opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200 z-30">
+              <div className="absolute right-0 top-full mt-2 w-64 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-4 opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200 z-[9999]">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-sm shrink-0">
                     {user?.name.charAt(0)}
@@ -172,6 +170,7 @@ export const Layout: React.FC = () => {
                   <div className="flex flex-col leading-tight min-w-0">
                     <span className="text-sm font-semibold text-slate-100 truncate">{user?.name}</span>
                     <span className="text-[11px] text-slate-400 truncate">{user?.email}</span>
+
                   </div>
                 </div>
                 <div className="flex items-center justify-between border-t border-slate-800 pt-2.5">
