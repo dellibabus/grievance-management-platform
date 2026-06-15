@@ -12,7 +12,8 @@ import {
   Menu,
   X,
   FileText,
-  ShieldAlert
+  ShieldAlert,
+  KeyRound
 } from "lucide-react";
 
 export const Layout: React.FC = () => {
@@ -56,6 +57,12 @@ export const Layout: React.FC = () => {
       path: "/audit-logs",
       icon: ShieldAlert,
       show: user?.role === "super_admin" || user?.role === "state_admin"
+    },
+    {
+      name: "Roles & Permissions",
+      path: "/roles",
+      icon: KeyRound,
+      show: user?.role === "super_admin"
     },
     {
       name: "Alerts Inbox",

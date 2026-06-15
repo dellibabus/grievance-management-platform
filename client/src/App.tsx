@@ -19,6 +19,7 @@ import { UserManagementPage } from "./pages/UserManagementPage";
 import { NotificationsPage } from "./pages/NotificationsPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { AuditLogsPage } from "./pages/AuditLogsPage";
+import { RoleManagementPage } from "./pages/RoleManagementPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -64,6 +65,11 @@ function App() {
                     {/* Audit Logs — super_admin / state_admin only */}
                     <Route element={<ProtectedRoute requiredRoles={["super_admin", "state_admin"]} />}>
                       <Route path="/audit-logs" element={<AuditLogsPage />} />
+                    </Route>
+
+                    {/* Roles & Permissions — super_admin only */}
+                    <Route element={<ProtectedRoute requiredRoles={["super_admin"]} />}>
+                      <Route path="/roles" element={<RoleManagementPage />} />
                     </Route>
 
                     {/* Notifications & Profile */}

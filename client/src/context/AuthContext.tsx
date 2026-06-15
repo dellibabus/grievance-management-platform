@@ -6,7 +6,7 @@ export interface UserProfile {
   name: string;
   email: string;
   phone: string;
-  role: "super_admin" | "state_admin" | "district_admin" | "volunteer";
+  role: string;
   permissions: string[];
   district: { id: string; name: string } | null;
 }

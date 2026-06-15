@@ -10,7 +10,7 @@ export class Role {
     length: 50,
     unique: true
   })
-  name!: "super_admin" | "state_admin" | "district_admin" | "volunteer";
+  name!: string;
 
   @Column({ type: "jsonb", default: [] })
   permissions!: string[];
