@@ -298,12 +298,10 @@ export const UserManagementPage: React.FC = () => {
                   <input required value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 text-slate-200" placeholder="9876543210" />
                 </div>
               </div>
-              {!editingUser && (
-                <div>
-                  <label className="block text-slate-400 font-semibold mb-1">Email *</label>
-                  <input required type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 text-slate-200" placeholder="user@example.com" />
-                </div>
-              )}
+              <div>
+                <label className="block text-slate-400 font-semibold mb-1">Email *</label>
+                <input required type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 text-slate-200" placeholder="user@example.com" />
+              </div>
               <div>
                 <label className="block text-slate-400 font-semibold mb-1">{editingUser ? "New Password (leave blank to keep)" : "Password *"}</label>
                 <input type="password" required={!editingUser} value={form.password} onChange={e => setForm(p => ({ ...p, password: e.target.value }))} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 text-slate-200" placeholder="••••••••" />

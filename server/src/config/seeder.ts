@@ -11,7 +11,7 @@ import { ComplaintUpdate } from "../entities/ComplaintUpdate";
 import bcrypt from "bcrypt";
 
 export async function runSeeder() {
-  console.log("Starting database seeding...");
+  // console.log("Starting database seeding...");
 
   if (!AppDataSource.isInitialized) {
     await AppDataSource.initialize();
@@ -42,7 +42,7 @@ export async function runSeeder() {
     }
   }
 
-  console.log("Truncated existing tables.");
+  // console.log("Truncated existing tables.");
 
   // 1. Seed Permissions
   const permList = [
@@ -64,7 +64,7 @@ export async function runSeeder() {
     perm.description = p.description;
     permissionsMap[p.name] = await AppDataSource.getRepository(Permission).save(perm);
   }
-  console.log("Permissions seeded.");
+  // console.log("Permissions seeded.");
 
   // 2. Seed Roles
   const rolesData = [
@@ -118,7 +118,7 @@ export async function runSeeder() {
     role.permissions = r.permissions;
     rolesMap[r.name] = await AppDataSource.getRepository(Role).save(role);
   }
-  console.log("Roles seeded.");
+  // console.log("Roles seeded.");
 
   // 3. Seed Categories
   const categoriesData = [
@@ -138,7 +138,7 @@ export async function runSeeder() {
     category.is_active = true;
     categoriesMap[c.name] = await AppDataSource.getRepository(Category).save(category);
   }
-  console.log("Categories seeded.");
+  // console.log("Categories seeded.");
 
   // 4. Seed Districts, Mandals, and Villages
   const locationData = [
@@ -263,7 +263,7 @@ export async function runSeeder() {
       }
     }
   }
-  console.log("Districts, Mandals, and Villages seeded.");
+  // console.log("Districts, Mandals, and Villages seeded.");
 
   // 5. Seed Users
   // Super Admin: admin@grievance.com / Admin@123
@@ -272,7 +272,7 @@ export async function runSeeder() {
   const hashedPassword = await bcrypt.hash("Admin@123", salt);
 
   const superAdmin = new User();
-  superAdmin.name = "Super Administrator";
+  superAdmin.name = "Super Admin";
   superAdmin.email = "admin@grievance.com";
   superAdmin.password = hashedPassword;
   superAdmin.phone = "9876543210";
@@ -283,8 +283,8 @@ export async function runSeeder() {
 
   // State Admin
   const stateAdmin = new User();
-  stateAdmin.name = "State Admin User";
-  stateAdmin.email = "state@grievance.com";
+  stateAdmin.name = "State Admin";
+  stateAdmin.email = "stateadmin@grievance.com";
   stateAdmin.password = hashedPassword;
   stateAdmin.phone = "9876543211";
   stateAdmin.role = rolesMap["state_admin"];
@@ -294,27 +294,27 @@ export async function runSeeder() {
 
   // District Admin: Visakhapatnam
   const vizagAdmin = new User();
-  vizagAdmin.name = "Vizag District Admin";
-  vizagAdmin.email = "vizag_admin@grievance.com";
+  vizagAdmin.name = "District Admin";
+  vizagAdmin.email = "districtadmin@grievance.com";
   vizagAdmin.password = hashedPassword;
   vizagAdmin.phone = "9876543212";
   vizagAdmin.role = rolesMap["district_admin"];
-  vizagAdmin.district = districtsMap["Visakhapatnam"];
+  vizagAdmin.district = districtsMap["Hyderabad"];
   vizagAdmin.is_active = true;
   const savedVizagAdmin = await userRepo.save(vizagAdmin);
 
   // Volunteer: Visakhapatnam, Bheemunipatnam mandal
   const volunteer = new User();
-  volunteer.name = "Vizag Volunteer A";
-  volunteer.email = "volunteer_vizag@grievance.com";
+  volunteer.name = "Volunteer";
+  volunteer.email = "volunteer@grievance.com";
   volunteer.password = hashedPassword;
   volunteer.phone = "9876543213";
   volunteer.role = rolesMap["volunteer"];
-  volunteer.district = districtsMap["Visakhapatnam"];
+  volunteer.district = districtsMap["Hyderabad"];
   volunteer.is_active = true;
   const savedVolunteer = await userRepo.save(volunteer);
 
-  console.log("Users seeded.");
+  // console.log("Users seeded.");
 
   // 6. Seed Complaints (10 Sample Complaints)
   const complaintRepo = AppDataSource.getRepository(Complaint);
@@ -481,13 +481,13 @@ export async function runSeeder() {
     complaint.status = compData.status;
     complaint.priority = compData.priority;
     complaint.category = categoriesMap[compData.categoryName];
-    
+
     const dist = districtsMap[compData.districtName];
     complaint.district = dist;
-    
+
     const mandal = mandalsMap[dist.id][compData.mandalIndex];
     complaint.mandal = mandal;
-    
+
     const village = villagesMap[mandal.id][compData.villageIndex];
     complaint.village = village;
 
@@ -527,8 +527,8 @@ export async function runSeeder() {
     }
   }
 
-  console.log("Complaints seeded.");
-  console.log("Database seeding completed successfully!");
+  // console.log("Complaints seeded.");
+  // console.log("Database seeding completed successfully!");
 }
 
 // If run directly from terminal

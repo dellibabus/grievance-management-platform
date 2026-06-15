@@ -60,7 +60,7 @@ Backend API runs at **http://localhost:5000**
 ---
 
 
-## API Endpoints
+<!-- ## API Endpoints
 
 ### Auth
 ```
@@ -116,7 +116,7 @@ GET /api/locations/categories
 GET /api/locations/roles
 ```
 
----
+--- -->
 
 ## RBAC Summary
 

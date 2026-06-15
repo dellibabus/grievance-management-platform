@@ -77,7 +77,6 @@ export const TrackingPage: React.FC = () => {
       {/* Navbar */}
       <nav className="bg-slate-900/60 border-b border-slate-850 py-4 px-6 md:px-12 flex justify-between items-center sticky top-0 backdrop-blur-md z-30">
         <Link to="/" className="flex items-center gap-3">
-          <FileText className="h-6 w-6 text-blue-500" />
           <span className="font-extrabold text-lg tracking-wider bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
             Grievance AI
           </span>
@@ -195,11 +194,10 @@ export const TrackingPage: React.FC = () => {
                       <div key={idx} className="relative">
                         {/* Bullet node */}
                         <div
-                          className={`absolute -left-[31px] top-0.5 h-4 w-4 rounded-full border-2 bg-slate-950 flex items-center justify-center ${
-                            isLast
+                          className={`absolute -left-[31px] top-0.5 h-4 w-4 rounded-full border-2 bg-slate-950 flex items-center justify-center ${isLast
                               ? "border-blue-500 ring-4 ring-blue-500/25 animate-pulse"
                               : "border-slate-800"
-                          }`}
+                            }`}
                         >
                           {isLast && <div className="h-1.5 w-1.5 rounded-full bg-blue-500"></div>}
                         </div>

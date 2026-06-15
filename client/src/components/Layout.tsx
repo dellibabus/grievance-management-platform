@@ -150,10 +150,10 @@ export const Layout: React.FC = () => {
             </h2>
           </div>
           <div className="flex items-center gap-4">
-            <Link to="/notifications" className="relative p-2 text-slate-400 hover:text-slate-200">
+            {/* <Link to="/notifications" className="relative p-2 text-slate-400 hover:text-slate-200">
               <Bell className="h-5 w-5" />
               <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-blue-500"></span>
-            </Link>
+            </Link> */}
             <div className="relative group border-l border-slate-800 pl-4">
               <Link to="/profile" className="flex items-center">
                 <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-xs shrink-0">
