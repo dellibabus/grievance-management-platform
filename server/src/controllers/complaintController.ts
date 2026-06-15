@@ -117,7 +117,7 @@ export const createComplaint = async (req: AuthenticatedRequest, res: Response) 
         attach.complaint = savedComplaint;
         attach.file_url = `/uploads/${file.filename}`;
         attach.file_name = file.originalname;
-        
+
         // Match mime-type to file_type enum
         if (file.mimetype.startsWith("image/")) {
           attach.file_type = "image";
@@ -147,7 +147,7 @@ export const createComplaint = async (req: AuthenticatedRequest, res: Response) 
     initialUpdate.complaint = savedComplaint;
     initialUpdate.status = "pending";
     initialUpdate.comment = "Complaint successfully submitted and registered in the system.";
-    
+
     if (req.user) {
       const updater = await userRepo.findOne({ where: { id: req.user.id } });
       initialUpdate.updated_by = updater!;
@@ -358,7 +358,7 @@ export const updateComplaint = async (req: AuthenticatedRequest, res: Response) 
       if (!complaint.assigned_to || complaint.assigned_to.id !== userId) {
         return res.status(403).json({ success: false, message: "Forbidden: Complaint is not assigned to you" });
       }
-      
+
       // Volunteers can only change status
       if (priority) {
         return res.status(403).json({ success: false, message: "Forbidden: Volunteers cannot modify ticket priority" });
@@ -611,8 +611,8 @@ export const addUpdate = async (req: AuthenticatedRequest, res: Response) => {
     let statusText = complaint.status;
     if (status && status !== complaint.status) {
       // Volunteers can only set to in_progress or resolved
-      if (role === "volunteer" && status !== "in_progress" && status !== "resolved") {
-        return res.status(403).json({ success: false, message: "Forbidden: Volunteers can only set status to 'in_progress' or 'resolved'" });
+      if (role === "volunteer" && status !== "in_progress" && status !== "resolved" && status !== "closed" && status !== "rejected") {
+        return res.status(403).json({ success: false, message: "Forbidden: Volunteers can only set status to 'in_progress' or 'resolved' or 'closed' or 'rejected'" });
       }
 
       complaint.status = status;
@@ -623,10 +623,10 @@ export const addUpdate = async (req: AuthenticatedRequest, res: Response) => {
       } else {
         complaint.resolved_at = null;
       }
-      
+
       await compRepo.save(complaint);
     }
-    
+
     update.status = statusText;
     await updateRepo.save(update);
 

@@ -32,7 +32,7 @@ export const ComplaintDetailPage: React.FC = () => {
 
   const [comment, setComment] = useState("");
   const [updateStatus, setUpdateStatus] = useState("");
-  
+
   const [assigneeId, setAssigneeId] = useState("");
   const [assignNotes, setAssignNotes] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -356,13 +356,13 @@ export const ComplaintDetailPage: React.FC = () => {
           {/* Citizen contacts panel */}
           <div className="glassmorphism p-6 rounded-2xl shadow-md border-slate-850">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Citizen Contact</h3>
-            
+
             <div className="flex flex-col gap-3 text-xs">
               <div className="flex items-center gap-2.5 text-slate-350">
                 <User className="h-4 w-4 text-blue-500 shrink-0" />
                 <span className="font-semibold text-slate-200">{complaint.citizen_name}</span>
               </div>
-              
+
               <div className="flex items-center gap-2.5 text-slate-350">
                 <Phone className="h-4 w-4 text-emerald-500 shrink-0" />
                 <span>{complaint.citizen_phone}</span>
@@ -435,19 +435,21 @@ export const ComplaintDetailPage: React.FC = () => {
                   options={
                     user?.role === "volunteer"
                       ? [
-                          { value: "", label: "Keep Current Status" },
-                          { value: "in_progress", label: "In Progress" },
-                          { value: "resolved", label: "Resolved" }
-                        ]
+                        { value: "", label: "Keep Current Status" },
+                        { value: "in_progress", label: "In Progress" },
+                        { value: "resolved", label: "Resolved" },
+                        { value: "closed", label: "Closed" },
+                        { value: "rejected", label: "Rejected" }
+                      ]
                       : [
-                          { value: "", label: "Keep Current Status" },
-                          { value: "pending", label: "Pending" },
-                          { value: "assigned", label: "Assigned" },
-                          { value: "in_progress", label: "In Progress" },
-                          { value: "resolved", label: "Resolved" },
-                          { value: "closed", label: "Closed" },
-                          { value: "rejected", label: "Rejected" }
-                        ]
+                        { value: "", label: "Keep Current Status" },
+                        { value: "pending", label: "Pending" },
+                        { value: "assigned", label: "Assigned" },
+                        { value: "in_progress", label: "In Progress" },
+                        { value: "resolved", label: "Resolved" },
+                        { value: "closed", label: "Closed" },
+                        { value: "rejected", label: "Rejected" }
+                      ]
                   }
                 />
               </div>
