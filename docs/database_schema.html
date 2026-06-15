@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Grievance Management Platform — Database Schema</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  @page { size: A4 landscape; margin: 14mm; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; color: #1f2933; font-size: 11px; line-height: 1.5; }
+  .cover { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 30px; color: #1d4ed8; margin-bottom: 6px; }
+  .cover h2 { font-size: 16px; color: #475569; font-weight: 400; margin-top: 0; }
+  .cover .badge { margin-top: 28px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; padding: 8px 18px; border-radius: 20px; font-size: 12px; }
+  h1 { font-size: 20px; color: #1d4ed8; border-bottom: 2px solid #1d4ed8; padding-bottom: 4px; margin-top: 0; }
+  h2 { font-size: 15px; color: #1e3a8a; margin-top: 16px; border-left: 4px solid #1d4ed8; padding-left: 8px; }
+  section { page-break-before: always; }
+  section:first-of-type { page-break-before: avoid; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 12px; font-size: 10px; }
+  th, td { border: 1px solid #cbd5e1; padding: 5px 7px; text-align: left; vertical-align: top; }
+  th { background: #eff6ff; color: #1e3a8a; }
+  .mermaid { text-align: center; }
+  code { font-family: 'Consolas','Courier New',monospace; background:#f1f5f9; padding:1px 4px; border-radius:4px; color:#b91c1c; font-size:10px;}
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Grievance Management Platform</h1>
+  <h2>Database Schema (Entity-Relationship Diagram)</h2>
+  <div class="badge">PostgreSQL + TypeORM &mdash; 14 Entities</div>
+</div>
+
+<section>
+<h1>Entity-Relationship Diagram</h1>
+<div class="mermaid">
+erDiagram
+    ROLES ||--o{ USERS : "has"
+    DISTRICTS ||--o{ USERS : "assigned to"
+    DISTRICTS ||--o{ MANDALS : "contains"
+    MANDALS ||--o{ VILLAGES : "contains"
+
+    DISTRICTS ||--o{ COMPLAINTS : "located in"
+    MANDALS ||--o{ COMPLAINTS : "located in"
+    VILLAGES ||--o{ COMPLAINTS : "located in"
+    CATEGORIES ||--o{ COMPLAINTS : "categorized as"
+    USERS ||--o{ COMPLAINTS : "created_by"
+    USERS ||--o{ COMPLAINTS : "assigned_to"
+
+    COMPLAINTS ||--o{ COMPLAINT_UPDATES : "has timeline"
+    USERS ||--o{ COMPLAINT_UPDATES : "posted by"
+
+    COMPLAINTS ||--o{ ATTACHMENTS : "has files"
+    USERS ||--o{ ATTACHMENTS : "uploaded by"
+
+    COMPLAINTS ||--o{ ASSIGNMENTS : "assignment history"
+    USERS ||--o{ ASSIGNMENTS : "assigned_by"
+    USERS ||--o{ ASSIGNMENTS : "assigned_to"
+
+    USERS ||--o{ NOTIFICATIONS : "receives"
+    USERS ||--o{ REFRESH_TOKENS : "owns"
+    USERS ||--o{ AUDIT_LOGS : "performed by"
+
+    ROLES {
+        uuid id PK
+        varchar name "unique, dynamic"
+        jsonb permissions
+        timestamp created_at
+    }
+    PERMISSIONS {
+        uuid id PK
+        varchar name UK
+        varchar description
+    }
+    USERS {
+        uuid id PK
+        varchar name
+        varchar email UK
+        varchar password
+        varchar phone
+        uuid role_id FK
+        uuid district_id FK
+        boolean is_active
+        timestamp created_at
+        timestamp updated_at
+    }
+    DISTRICTS {
+        uuid id PK
+        varchar name UK
+        varchar state
+    }
+    MANDALS {
+        uuid id PK
+        varchar name
+        uuid district_id FK
+    }
+    VILLAGES {
+        uuid id PK
+        varchar name
+        uuid mandal_id FK
+    }
+    CATEGORIES {
+        uuid id PK
+        varchar name UK
+        text description
+        varchar icon
+        boolean is_active
+    }
+    COMPLAINTS {
+        uuid id PK
+        varchar ticket_number UK
+        varchar title
+        text description
+        varchar status
+        varchar priority
+        uuid category_id FK
+        varchar citizen_name
+        varchar citizen_phone
+        varchar citizen_email
+        uuid district_id FK
+        uuid mandal_id FK
+        uuid village_id FK
+        uuid assigned_to FK
+        uuid created_by FK
+        timestamp resolved_at
+        timestamp created_at
+        timestamp updated_at
+    }
+    COMPLAINT_UPDATES {
+        uuid id PK
+        uuid complaint_id FK
+        uuid updated_by FK
+        varchar status
+        text comment
+        timestamp created_at
+    }
+    ATTACHMENTS {
+        uuid id PK
+        uuid complaint_id FK
+        varchar file_url
+        varchar file_name
+        varchar file_type
+        integer file_size
+        uuid uploaded_by FK
+        timestamp created_at
+    }
+    ASSIGNMENTS {
+        uuid id PK
+        uuid complaint_id FK
+        uuid assigned_by FK
+        uuid assigned_to FK
+        text notes
+        timestamp assigned_at
+    }
+    NOTIFICATIONS {
+        uuid id PK
+        uuid user_id FK
+        varchar title
+        text message
+        varchar type
+        boolean is_read
+        uuid reference_id
+        timestamp created_at
+    }
+    REFRESH_TOKENS {
+        uuid id PK
+        uuid user_id FK
+        varchar token UK
+        timestamp expires_at
+        boolean is_revoked
+        timestamp created_at
+    }
+    AUDIT_LOGS {
+        uuid id PK
+        uuid user_id FK
+        varchar action
+        varchar entity
+        uuid entity_id
+        jsonb meta
+        varchar ip_address
+        timestamp created_at
+    }
+</div>
+</section>
+
+<section>
+<h1>Table Reference</h1>
+<table>
+<tr><th>Table</th><th>Purpose</th></tr>
+<tr><td><code>roles</code></td><td>Dynamic roles with a <code>permissions</code> jsonb array. Super admins can create/edit/delete roles via the UI.</td></tr>
+<tr><td><code>permissions</code></td><td>Master catalog of permission names &amp; descriptions, referenced by roles.</td></tr>
+<tr><td><code>users</code></td><td>All staff accounts. <code>district_id</code> is null for state-level roles (super_admin / state_admin).</td></tr>
+<tr><td><code>districts / mandals / villages</code></td><td>Geographic hierarchy (cascade delete downward) used for scoping complaints and users.</td></tr>
+<tr><td><code>categories</code></td><td>Complaint categories shown in dropdowns (Infrastructure, Healthcare, etc.)</td></tr>
+<tr><td><code>complaints</code></td><td>Core grievance ticket — status, priority, location, category, assignee, creator.</td></tr>
+<tr><td><code>complaint_updates</code></td><td>Append-only timeline of status changes and comments.</td></tr>
+<tr><td><code>attachments</code></td><td>Uploaded files (image/pdf/video) linked to a complaint.</td></tr>
+<tr><td><code>assignments</code></td><td>History log of every assignment action.</td></tr>
+<tr><td><code>notifications</code></td><td>Per-user in-app notification feed.</td></tr>
+<tr><td><code>refresh_tokens</code></td><td>Server-side store of 7-day refresh tokens for revocation/logout.</td></tr>
+<tr><td><code>audit_logs</code></td><td>System-wide audit trail of sensitive actions (login, CRUD on users/complaints/roles).</td></tr>
+</table>
+
+<h2>Role &rarr; Visibility Matrix</h2>
+<table>
+<tr><th>Role</th><th>district_id</th><th>Complaint Visibility</th><th>User Management</th></tr>
+<tr><td>super_admin</td><td>null</td><td>All complaints</td><td>All users + role management + audit logs</td></tr>
+<tr><td>state_admin</td><td>null</td><td>All complaints</td><td>All users (read) + audit logs</td></tr>
+<tr><td>district_admin</td><td>set</td><td>Own district only</td><td>Own district users</td></tr>
+<tr><td>volunteer</td><td>set</td><td>Assigned tickets only</td><td>N/A</td></tr>
+</table>
+</section>
+
+<script>
+  mermaid.initialize({ startOnLoad: true, er: { useMaxWidth: false }, theme: 'default' });
+</script>
+</body>
+</html>

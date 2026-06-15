@@ -8,6 +8,8 @@ All authenticated endpoints require an `Authorization: Bearer <accessToken>` hea
 - [Auth](#auth)
 - [Complaints](#complaints)
 - [Users](#users)
+- [Roles & Permissions](#roles--permissions)
+- [Audit Logs](#audit-logs)
 - [Dashboard](#dashboard)
 - [Locations](#locations)
 - [Notifications](#notifications)
@@ -57,49 +59,60 @@ Returns the authenticated user's sanitized profile (no password hash).
 
 ## Complaints
 Base path: `/api/complaints`
-All routes require `authenticate`. Permission requirements noted per-route.
 
-| Method | Path | Permission | Description |
+| Method | Path | Auth | Description |
 |---|---|---|---|
-| GET | `/` | `view_complaints` | List complaints (paginated, filterable). Scoped by role — see [Visibility](#visibility-rules) |
-| GET | `/:id` | `view_complaints` | Get a single complaint with relations (category, district, mandal, village, assignee, creator, updates, attachments) |
-| POST | `/` | `create_complaint` | Create a new complaint (multipart/form-data, supports up to 5 attachments) |
-| PUT | `/:id` | `edit_complaint` | Update complaint fields |
-| PATCH | `/:id/status` | `update_status` | Update status and append a `complaint_updates` entry |
-| PATCH | `/:id/assign` | `assign_complaint` | Assign/reassign complaint to a volunteer, creates an `assignments` record |
-| DELETE | `/:id` | `delete_complaint` | Delete a complaint |
+| GET | `/track/:ticket` | Public | Track a complaint by ticket number (citizen-facing, sanitized response) |
+| POST | `/` | Optional (multipart/form-data, up to 5 `attachments` files) | Create a new complaint — works for anonymous citizens and logged-in staff |
+| GET | `/` | Authenticated | List complaints (filterable). Scoped by role — see [Visibility](#visibility-rules) |
+| GET | `/:id` | Authenticated | Get a single complaint with category, district, mandal, village, assignee, creator, attachments and timeline updates |
+| PUT | `/:id` | Authenticated | Update `status` and/or `priority` (appends a `complaint_updates` timeline entry) |
+| DELETE | `/:id` | `delete_complaint` permission | Delete a complaint |
+| POST | `/:id/assign` | `assign_complaint` permission | Assign/reassign complaint to a volunteer or district admin, creates an `assignments` record |
+| POST | `/:id/update` | Authenticated | Add a timeline comment, optionally changing `status` |
 
 ### Query parameters for `GET /api/complaints`
 | Param | Type | Notes |
 |---|---|---|
-| `page` | number | Default `1` |
-| `limit` | number | Default `10` |
 | `status` | string | `pending\|assigned\|in_progress\|resolved\|closed\|rejected` |
 | `priority` | string | `low\|medium\|high\|critical` |
 | `category_id` | uuid | Filter by category |
 | `district_id` | uuid | Filter by district (super_admin/state_admin only — others are forced to their own district/assignment) |
-| `search` | string | Matches ticket number, title, citizen name/phone |
+| `search` | string | Matches ticket number, title, citizen name |
 
 ### POST `/api/complaints` (multipart/form-data)
 **Fields:** `title`, `description`, `citizen_name`, `citizen_phone`, `citizen_email` (optional), `category_id`, `district_id`, `mandal_id`, `village_id` (optional), `priority`, `attachments` (files, max 5).
 
 **Response:**
 ```json
-{ "success": true, "ticket_number": "GRV-2026-00042", "complaint": { ... } }
+{ "success": true, "ticket_number": "GRV-2026-00042", "id": "uuid", "message": "Grievance submitted successfully" }
 ```
+Side effects: creates the initial `complaint_updates` entry, emits a Socket.io event to the district room, and creates in-app notifications for that district's admins.
 
-### PATCH `/api/complaints/:id/status`
+### PUT `/api/complaints/:id`
 **Body:**
 ```json
-{ "status": "in_progress", "comment": "Field team dispatched" }
+{ "status": "in_progress", "priority": "high" }
 ```
-Volunteers may only set `in_progress` or `resolved`.
+- Either field is optional, but at least one must change.
+- Setting `status` to `"resolved"` stamps `resolved_at`; any other status clears it.
+- `district_admin` is restricted to complaints in their own district. `volunteer` is restricted to complaints assigned to them and **cannot** change `priority`.
 
-### PATCH `/api/complaints/:id/assign`
+### POST `/api/complaints/:id/assign`
 **Body:**
 ```json
-{ "assigned_to": "uuid-of-volunteer", "notes": "Optional note" }
+{ "assigned_to_id": "uuid-of-volunteer-or-district-admin", "notes": "Optional note" }
 ```
+- Assignee must have role `volunteer` or `district_admin` and belong to the same district as the complaint.
+- Sets complaint status to `assigned` if it was `pending`, logs an `assignments` record, and notifies the assignee.
+
+### POST `/api/complaints/:id/update`
+**Body:**
+```json
+{ "comment": "Site visit completed, awaiting parts.", "status": "in_progress" }
+```
+- `comment` is required; `status` is optional.
+- Volunteers may only transition `status` to `in_progress`, `resolved`, `closed`, or `rejected`.
 
 ### Visibility Rules
 | Role | Complaints visible |
@@ -112,11 +125,11 @@ Volunteers may only set `in_progress` or `resolved`.
 
 ## Users
 Base path: `/api/users`
-All routes require `authenticate` + `manage_users` permission (super_admin / district_admin).
+All routes require `authenticate` + `manage_users` permission.
 
 | Method | Path | Description |
 |---|---|---|
-| GET | `/` | List users (district_admin sees only users in their own district) |
+| GET | `/` | List all users (with role and district relations) |
 | POST | `/` | Create a new user |
 | PUT | `/:id` | Update a user (name, phone, role, district, active status, optional password reset) |
 | DELETE | `/:id` | Delete a user (cannot delete self) |
@@ -133,10 +146,93 @@ All routes require `authenticate` + `manage_users` permission (super_admin / dis
   "districtId": "uuid-or-null"
 }
 ```
-- `district_admin` callers are restricted to creating users within their own district and cannot create `super_admin`/`state_admin` accounts.
 
 ### PUT `/api/users/:id`
 **Body:** any subset of `{ name, phone, roleName, districtId, password, is_active }`.
+
+> The User Management page (frontend) additionally supports client-side search (name/email/phone), role filter, status filter (Active/Suspended), and Excel/PDF export of the filtered list.
+
+---
+
+## Roles & Permissions
+Base path: `/api/roles`
+All routes require `authenticate`. Mutations (`POST`/`PUT`/`DELETE`) are restricted to `super_admin` in the controller.
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/permissions` | List the master permission catalog (`{ name, description }[]`) |
+| POST | `/permissions` | Create a new permission definition — `super_admin` only |
+| GET | `/` | List all roles with their assigned permissions and user counts |
+| POST | `/` | Create a new role |
+| PUT | `/:id` | Update a role's permission list (and/or rename it) |
+| DELETE | `/:id` | Delete a custom role (blocked for built-in roles or roles still assigned to users) |
+
+### POST `/api/roles`
+**Body:**
+```json
+{ "name": "Field Inspector", "permissions": ["view_complaints", "edit_complaint"] }
+```
+- `name` is normalized: trimmed, lowercased, spaces replaced with `_` (e.g. `"Field Inspector"` → `"field_inspector"`).
+- Returns `400` if a role with that normalized name already exists.
+
+### PUT `/api/roles/:id`
+**Body:**
+```json
+{ "permissions": ["view_complaints", "view_dashboard"] }
+```
+
+### DELETE `/api/roles/:id`
+- Blocked (`400`) for the 4 built-in roles: `super_admin`, `state_admin`, `district_admin`, `volunteer`.
+- Blocked (`400`) if any user currently has this role assigned (checked via `users.role_id` count).
+
+### POST `/api/roles/permissions`
+**Body:**
+```json
+{ "name": "export_reports", "description": "Allow exporting dashboard reports to PDF/Excel" }
+```
+
+> Every create/update/delete here writes a `CREATE_ROLE` / `UPDATE_ROLE` / `DELETE_ROLE` / `CREATE_PERMISSION` entry to `audit_logs`. This is what powers the new **Roles & Permissions** admin page — roles and permissions are now fully dynamic and no longer rely solely on seeder data.
+
+---
+
+## Audit Logs
+Base path: `/api/audit-logs`
+All routes require `authenticate`. Access is restricted to `super_admin` / `state_admin` in the controller.
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/` | Paginated, filterable list of audit log entries (most recent first) |
+| GET | `/meta` | Distinct `action` and `entity` values, used to populate filter dropdowns |
+
+### Query parameters for `GET /api/audit-logs`
+| Param | Type | Notes |
+|---|---|---|
+| `page` | number | Default `1` |
+| `limit` | number | Default `20` |
+| `search` | string | Matches user name, email, or record ID |
+| `action` | string | e.g. `LOGIN`, `CREATE_COMPLAINT`, `UPDATE_ROLE` |
+| `entity` | string | e.g. `users`, `complaints`, `roles`, `permissions` |
+
+**Response:**
+```json
+{
+  "success": true,
+  "logs": [
+    {
+      "id": "uuid",
+      "user": { "id": "uuid", "name": "...", "email": "..." },
+      "action": "LOGIN",
+      "entity": "users",
+      "entity_id": "uuid",
+      "meta": { "email": "admin@grievance.com" },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-06-15T08:00:00.000Z"
+    }
+  ],
+  "total": 120,
+  "totalPages": 6
+}
+```
 
 ---
 

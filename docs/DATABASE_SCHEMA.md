@@ -34,7 +34,7 @@ erDiagram
 
     ROLES {
         uuid id PK
-        varchar name "super_admin | state_admin | district_admin | volunteer"
+        varchar name "dynamic — created by super_admin via UI"
         jsonb permissions
         timestamp created_at
     }
