@@ -144,5 +144,5 @@ vite.config.ts.timestamp-*
 
 interview_prep.html
 Interview_Preparation_Grievance_Platform.pdf
-.docs
+docs/
 .claude
