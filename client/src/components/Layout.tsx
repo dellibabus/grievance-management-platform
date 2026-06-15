@@ -85,7 +85,6 @@ export const Layout: React.FC = () => {
       {/* Mobile Header Bar */}
       <header className="md:hidden bg-slate-900 border-b border-slate-800 p-4 flex justify-between items-center z-30">
         <Link to="/dashboard" className="flex items-center gap-2">
-          <FileText className="h-6 w-6 text-blue-500" />
           <span className="font-bold text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
             Grievance
           </span>

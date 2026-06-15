@@ -181,7 +181,7 @@ export const UserManagementPage: React.FC = () => {
       </div>
 
       {/* Filters */}
-      <div className="glassmorphism p-4 rounded-2xl flex flex-col md:flex-row gap-3">
+      <div className="glassmorphism p-4 rounded-2xl flex flex-col md:flex-row gap-3 relative z-20">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
           <input

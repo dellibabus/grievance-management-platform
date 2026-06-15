@@ -240,7 +240,7 @@ export const ComplaintsListPage: React.FC = () => {
       </div>
 
       {/* Filters Segment */}
-      <div className="glassmorphism p-5 rounded-2xl flex flex-col gap-4 border-slate-850">
+      <div className="glassmorphism p-5 rounded-2xl flex flex-col gap-4 border-slate-850 relative z-20">
         <div className="flex items-center gap-2 text-xs font-bold text-slate-200">
           <Filter className="h-4 w-4 text-blue-500" />
           <span>Search & Filters</span>
