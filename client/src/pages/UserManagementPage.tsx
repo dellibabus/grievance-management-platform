@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import { apiClient } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import { Plus, Pencil, Trash2, X, Check } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Check, Search, FileSpreadsheet, FileDown } from "lucide-react";
 import { ConfirmModal } from "../components/ConfirmModal";
 import { CustomSelect } from "../components/CustomSelect";
 
@@ -16,6 +19,10 @@ export const UserManagementPage: React.FC = () => {
   const [editingUser, setEditingUser] = useState<any>(null);
   const [deleteTarget, setDeleteTarget] = useState<any>(null);
   const [form, setForm] = useState({ name: "", email: "", password: "", phone: "", roleName: "volunteer", districtId: "" });
+
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
 
   const { data: usersData, isLoading } = useQuery({
     queryKey: ["users"],
@@ -75,6 +82,61 @@ export const UserManagementPage: React.FC = () => {
     setDeleteTarget(u);
   };
 
+  const filteredUsers = useMemo(() => {
+    if (!usersData) return [];
+    const term = search.trim().toLowerCase();
+    return usersData.filter((u: any) => {
+      const matchesSearch = !term
+        || u.name?.toLowerCase().includes(term)
+        || u.email?.toLowerCase().includes(term)
+        || u.phone?.toLowerCase().includes(term);
+      const matchesRole = !roleFilter || u.role?.name === roleFilter;
+      const matchesStatus = !statusFilter
+        || (statusFilter === "active" ? u.is_active : !u.is_active);
+      return matchesSearch && matchesRole && matchesStatus;
+    });
+  }, [usersData, search, roleFilter, statusFilter]);
+
+  const getExportRows = () => filteredUsers.map((u: any) => ({
+    Name: u.name,
+    Email: u.email,
+    Phone: u.phone,
+    Role: u.role?.name?.replace(/_/g, " ") || "",
+    District: u.district?.name || "State Level",
+    Status: u.is_active ? "Active" : "Suspended",
+    "Created On": new Date(u.created_at).toLocaleDateString()
+  }));
+
+  const exportExcel = () => {
+    const rows = getExportRows();
+    if (rows.length === 0) return;
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
+    XLSX.writeFile(workbook, `user_directory_${rows.length}.xlsx`);
+  };
+
+  const exportPDF = () => {
+    const rows = getExportRows();
+    if (rows.length === 0) return;
+
+    const doc = new jsPDF({ orientation: "landscape" });
+    doc.setFontSize(14);
+    doc.text("User Directory Report", 14, 12);
+    doc.setFontSize(9);
+    doc.text(`Generated: ${new Date().toLocaleString()} | Records: ${rows.length}`, 14, 18);
+
+    autoTable(doc, {
+      startY: 24,
+      head: [["Name", "Email", "Phone", "Role", "District", "Status", "Created On"]],
+      body: rows.map((r: Record<string, any>) => Object.values(r)),
+      styles: { fontSize: 8, cellPadding: 2 },
+      headStyles: { fillColor: [37, 99, 235] }
+    });
+
+    doc.save(`user_directory_${rows.length}.pdf`);
+  };
+
   const roleColorMap: Record<string, string> = {
     super_admin: "text-red-400 bg-red-950/40 border-red-900/30",
     state_admin: "text-orange-400 bg-orange-950/40 border-orange-900/30",
@@ -84,20 +146,84 @@ export const UserManagementPage: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white">User Directory</h1>
           <p className="text-xs text-slate-400 mt-1">Manage platform user accounts and roles.</p>
         </div>
-        {currentUser?.role === "super_admin" && (
-          <button onClick={() => { resetForm(); setEditingUser(null); setShowModal(true); }} className="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs py-2.5 px-4 rounded-xl flex items-center gap-2 shadow-md shadow-blue-600/10 transition-colors">
-            <Plus className="h-4 w-4" /><span>Add User</span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={exportExcel}
+            disabled={filteredUsers.length === 0}
+            title="Export to Excel"
+            className="bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-900/35 text-emerald-400 font-semibold text-xs py-2.5 px-3 rounded-xl flex items-center gap-2 transition-colors disabled:opacity-40"
+          >
+            <FileSpreadsheet className="h-4 w-4" />
+            <span>Excel</span>
           </button>
-        )}
+          <button
+            type="button"
+            onClick={exportPDF}
+            disabled={filteredUsers.length === 0}
+            title="Export to PDF"
+            className="bg-red-950/40 hover:bg-red-900/50 border border-red-900/35 text-red-400 font-semibold text-xs py-2.5 px-3 rounded-xl flex items-center gap-2 transition-colors disabled:opacity-40"
+          >
+            <FileDown className="h-4 w-4" />
+            <span>PDF</span>
+          </button>
+          {currentUser?.role === "super_admin" && (
+            <button onClick={() => { resetForm(); setEditingUser(null); setShowModal(true); }} className="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs py-2.5 px-4 rounded-xl flex items-center gap-2 shadow-md shadow-blue-600/10 transition-colors">
+              <Plus className="h-4 w-4" /><span>Add User</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="glassmorphism p-4 rounded-2xl flex flex-col md:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by name, email or phone..."
+            className="w-full bg-slate-950 border border-slate-850 rounded-xl pl-9 pr-4 py-2.5 text-xs focus:outline-none focus:border-blue-500 transition-colors"
+          />
+        </div>
+        <div className="w-full md:w-48">
+          <CustomSelect
+            value={roleFilter}
+            onChange={setRoleFilter}
+            placeholder="All Roles"
+            options={[
+              { value: "", label: "All Roles" },
+              ...(rolesData?.map((r: any) => ({ value: r.name, label: r.name.replace(/_/g, " ") })) || [])
+            ]}
+          />
+        </div>
+        <div className="w-full md:w-48">
+          <CustomSelect
+            value={statusFilter}
+            onChange={setStatusFilter}
+            placeholder="All Statuses"
+            options={[
+              { value: "", label: "All Statuses" },
+              { value: "active", label: "Active" },
+              { value: "suspended", label: "Suspended" }
+            ]}
+          />
+        </div>
       </div>
 
       {isLoading ? (
         <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500" /></div>
+      ) : filteredUsers.length === 0 ? (
+        <div className="glassmorphism p-16 rounded-2xl text-center border-slate-850">
+          <h3 className="font-bold text-slate-300">No Users Found</h3>
+          <p className="text-xs text-slate-450 mt-1">Try refining your search or filter parameters.</p>
+        </div>
       ) : (
         <div className="glassmorphism rounded-2xl overflow-hidden border-slate-850">
           <div className="overflow-x-auto">
@@ -110,7 +236,7 @@ export const UserManagementPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-900">
-                {usersData?.map((u: any) => (
+                {filteredUsers.map((u: any) => (
                   <tr key={u.id} className="hover:bg-slate-900/40 transition-colors">
                     <td className="py-3.5 px-5">
                       <div className="flex items-center gap-3">

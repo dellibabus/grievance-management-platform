@@ -128,7 +128,7 @@ export const DashboardPage: React.FC = () => {
               <span className="text-xs font-semibold text-slate-400 block">Total Grievances</span>
               <span className="text-2xl font-bold mt-1 block text-white">{statsData.total}</span>
             </div>
-            <div className="h-10 w-10 bg-slate-800/80 rounded-xl flex items-center justify-center text-slate-300 border border-slate-750">
+            <div className="h-10 w-10 bg-slate-800/80 rounded-xl flex items-center justify-center text-slate-300">
               <Ticket className="h-5 w-5 text-blue-400" />
             </div>
           </div>
@@ -139,20 +139,20 @@ export const DashboardPage: React.FC = () => {
               <span className="text-xs font-semibold text-slate-400 block">Pending Reviews</span>
               <span className="text-2xl font-bold mt-1 block text-amber-400">{statsData.pending}</span>
             </div>
-            <div className="h-10 w-10 bg-amber-950/20 rounded-xl flex items-center justify-center border border-amber-900/30">
+            <div className="h-10 w-10 bg-amber-950/20 rounded-xl flex items-center justify-center">
               <Clock className="h-5 w-5 text-amber-500" />
             </div>
           </div>
 
           {/* In Progress */}
-          <div className="glassmorphism p-5 rounded-2xl flex items-center justify-between border-slate-800">
+          <div className="glassmorphism p-5 rounded-2xl flex items-center justify-between">
             <div>
               <span className="text-xs font-semibold text-slate-400 block">In Investigation</span>
               <span className="text-2xl font-bold mt-1 block text-purple-400">
                 {statsData.in_progress + statsData.assigned}
               </span>
             </div>
-            <div className="h-10 w-10 bg-purple-950/20 rounded-xl flex items-center justify-center border border-purple-900/30">
+            <div className="h-10 w-10 bg-purple-950/20 rounded-xl flex items-center justify-center">
               <AlertTriangle className="h-5 w-5 text-purple-500" />
             </div>
           </div>
@@ -165,7 +165,7 @@ export const DashboardPage: React.FC = () => {
                 {statsData.resolved + statsData.closed}
               </span>
             </div>
-            <div className="h-10 w-10 bg-emerald-950/20 rounded-xl flex items-center justify-center border border-emerald-900/30">
+            <div className="h-10 w-10 bg-emerald-950/20 rounded-xl flex items-center justify-center">
               <CheckCircle2 className="h-5 w-5 text-emerald-500" />
             </div>
           </div>

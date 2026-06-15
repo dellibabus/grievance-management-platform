@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { FileText, AlertCircle, Eye, EyeOff } from "lucide-react";
+import { AlertCircle, Eye, EyeOff } from "lucide-react";
 
 export const LoginPage: React.FC = () => {
   const { login } = useAuth();
@@ -40,22 +40,16 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-center items-center p-6 relative overflow-hidden">
-      {/* Decorative gradient blur background circles */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
 
       <div className="max-w-md w-full z-10">
         {/* Branding header */}
         <div className="flex flex-col items-center mb-8">
-          <div className="h-12 w-12 bg-blue-600/10 border border-blue-500/30 rounded-2xl flex items-center justify-center mb-3">
-            <FileText className="h-6 w-6 text-blue-500" />
-          </div>
           <h1 className="text-2xl font-bold tracking-wide text-white">Grievance Portal</h1>
           <p className="text-xs text-slate-400 mt-1">Administrative Sign In</p>
         </div>
 
         {/* Login Form card */}
-        <div className="glassmorphism p-8 rounded-3xl shadow-2xl glow-blue">
+        <div className="glassmorphism p-8 rounded-3xl shadow-2xl">
           {error && (
             <div className="bg-red-950/45 border border-red-500/30 text-red-200 p-3.5 rounded-xl mb-5 flex gap-2 text-xs">
               <AlertCircle className="h-4 w-4 text-red-400 shrink-0" />
@@ -72,7 +66,7 @@ export const LoginPage: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-slate-950 border border-slate-850 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition-colors"
-                placeholder="admin@grievance.com"
+                placeholder="Enter your email"
               />
             </div>
 
@@ -85,7 +79,7 @@ export const LoginPage: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-850 rounded-xl pl-4 pr-10 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition-colors"
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                 />
                 <button
                   type="button"
@@ -117,7 +111,7 @@ export const LoginPage: React.FC = () => {
             href="/"
             className="text-xs text-slate-400 hover:text-slate-100 transition-colors font-medium"
           >
-            ← Back to Public Portal
+            Back to Public Portal
           </a>
         </div>
       </div>
